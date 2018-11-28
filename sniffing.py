@@ -24,7 +24,8 @@ def set_quality(browser,quality):
 	browser.find_elements_by_class_name("ytp-menuitem-label")[4].click()
 	# select desired quality
 	ActionChains(browser).click(browser.find_elements_by_class_name("ytp-menuitem-label")[quality[0]]).perform()
-	time.sleep(5)
+	print(ActionChains(browser).click(browser.find_elements_by_class_name("ytp-menuitem-label")))
+	time.sleep(2)
 
 def sniffing():
 	global test
@@ -42,7 +43,7 @@ def record( vid_id, quality ):
 	option.add_argument("--enable-quic")
 	option.add_argument('--no-sandbox')
 	log_name = "sniffing_log_" + time.strftime("%c")
-	browser = webdriver.Chrome(executable_path='/home/ehud/chromedriver', chrome_options=option)
+	browser = webdriver.Chrome(executable_path='../chromedriver', chrome_options=option)
 	while copies_counter != num_of_copies:
 		event_e.clear()
 		try:
@@ -71,7 +72,7 @@ def record( vid_id, quality ):
 
 			if not os.path.exists(video_quality):
 				os.makedirs(video_quality)
-			wrpcap(video_quality +"_"+ vid_id + ".cap", test)
+			wrpcap("video_quality/" + video_quality +"_"+ vid_id + ".cap", test)
 		except Exception as e:
 			with open("temp/"+log_name, "a+") as log:
 				log.write(str(e))
