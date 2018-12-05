@@ -33,6 +33,15 @@ def formatTime(time):
 		seconds = '0' + seconds
 	return str(minutes) + ":" + str(seconds)
 
+def set_quality2(browser,quality):
+	browser.find_element_by_class_name("ytp-settings-button").click()
+	# click quality button
+	browser.find_elements_by_class_name("ytp-menuitem-label")[4].click()
+	# select desired quality
+	ActionChains(browser).click(browser.find_elements_by_class_name("ytp-menuitem-label")[quality[0]]).perform()
+	print(ActionChains(browser).click(browser.find_elements_by_class_name("ytp-menuitem-label")))
+	time.sleep(2)
+
 def set_quality(browser,quality,log_file):
 	video_quality = ""
 	b = False
@@ -106,8 +115,9 @@ def record(vid_id, quality,is_auto):
 	if not os.path.exists("Records/"+date_today):
 		os.mkdir("Records/"+ date_today,0o777)
 	log_file = open("Records/"+ date_today + "/LogFile",'a+')
-
+	
 	while copies_counter != num_of_copies:
+		is_running =False
 		event_e.clear()
 		try:
 			browser.get("https://www.youtube.com/watch?v="+vid_id)
@@ -115,12 +125,19 @@ def record(vid_id, quality,is_auto):
 			while browser.execute_script(get_player_state) == -1:
 				continue
 			if is_auto != 1:
-				video_quality = set_quality(browser,quality,log_file)
-			else:
-				video_quality = browser.execute_script(get_Playback_quality) 
+				set_quality2(browser,quality)
+		
+				video_quality = browser.execute_script(get_Playback_quality)
+				if(video_quality != quality[1]):
+					raise Exception('quality isnt matching')
+				
 			
+			
+
+
 			t = threading.Thread(target=sniffing,args=[browser])
 			t.start()
+			is_running = True
 			while not event_e.is_set():
 				if browser.execute_script(get_Loaded_Fraction) == 1:
 					event_e.set()
@@ -149,7 +166,8 @@ def record(vid_id, quality,is_auto):
 		except Exception as e:
 			log_file.write(str(e) +"\n")
 			event_e.set()
-			t.join()
+			if is_running == True:
+				t.join()
 			
 	
 	browser.close()
