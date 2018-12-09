@@ -34,6 +34,7 @@ def formatTime(time):
 	return str(minutes) + ":" + str(seconds)
 
 def set_quality2(browser,quality):
+	print("yes")
 	browser.find_element_by_class_name("ytp-settings-button").click()
 	# click quality button
 	browser.find_elements_by_class_name("ytp-menuitem-label")[4].click()
@@ -43,6 +44,7 @@ def set_quality2(browser,quality):
 	time.sleep(2)
 
 def set_quality(browser,quality,log_file):
+	
 	video_quality = ""
 	b = False
 	while(b==False):
@@ -126,7 +128,7 @@ def record(vid_id, quality,is_auto):
 				continue
 			if is_auto != 1:
 				set_quality2(browser,quality)
-		
+				print("hello")
 				video_quality = browser.execute_script(get_Playback_quality)
 				if(video_quality != quality[1]):
 					raise Exception('quality isnt matching')
@@ -143,6 +145,7 @@ def record(vid_id, quality,is_auto):
 					event_e.set()
 					finish_capture_time = datetime.now()
 					video_length = formatTime(browser.execute_script(get_duration))
+			print("hereeee")
 
 			t.join()
 			time.sleep(3)
@@ -194,7 +197,7 @@ def main():
 		
 		num_of_copies = int(input("How many copies would you like to do to each video id:"))
 		with open("test.txt") as f:
-			quality_list = [(quality_144p, 'tiny'), (quality_244p, 'small'), (quality_360p, 'medium'),
+			quality_list = [(quality_1080p, 'hd1080'), (quality_244p, 'small'), (quality_360p, 'medium'),
 							(quality_480p, 'large'), (quality_720p, 'hd720'), (quality_1080p, 'hd1080')]
 			
 			for i in range(1, num_of_videos+1):
@@ -204,6 +207,7 @@ def main():
 					vid_id = user_vid
 				for quality in quality_list:
 					record(vid_id, quality,is_auto)
+					break
 	except KeyboardInterrupt:
 		sys.exit(1)
 if __name__ == "__main__":
