@@ -124,18 +124,16 @@ def record(vid_id, quality,is_auto):
 		try:
 			browser.get("https://www.youtube.com/watch?v="+vid_id)
 			time.sleep(2)
+			print("zzzzzzzzzzzzzzzzz")
 			while browser.execute_script(get_player_state) == -1:
 				continue
+			
 			if is_auto != 1:
 				set_quality2(browser,quality)
 				print("hello")
 				video_quality = browser.execute_script(get_Playback_quality)
 				if(video_quality != quality[1]):
 					raise Exception('quality isnt matching')
-				
-			
-			
-
 
 			t = threading.Thread(target=sniffing,args=[browser])
 			t.start()
@@ -197,7 +195,7 @@ def main():
 		
 		num_of_copies = int(input("How many copies would you like to do to each video id:"))
 		with open("test.txt") as f:
-			quality_list = [(quality_1080p, 'hd1080'), (quality_244p, 'small'), (quality_360p, 'medium'),
+			quality_list = [(quality_144p, 'tiny'), (quality_244p, 'small'), (quality_360p, 'medium'),
 							(quality_480p, 'large'), (quality_720p, 'hd720'), (quality_1080p, 'hd1080')]
 			
 			for i in range(1, num_of_videos+1):
@@ -207,7 +205,7 @@ def main():
 					vid_id = user_vid
 				for quality in quality_list:
 					record(vid_id, quality,is_auto)
-					break
+					
 	except KeyboardInterrupt:
 		sys.exit(1)
 if __name__ == "__main__":
