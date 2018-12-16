@@ -10,6 +10,7 @@ get_Playback_quality = "return document.getElementById('movie_player').getPlayba
 get_Playback_quality = "return document.getElementById('movie_player').getPlaybackQuality()"
 get_duration = "return document.getElementById('movie_player').getDuration()"
 get_current_time = "return document.getElementById('movie_player').getCurrentTime()"
+play_video = "return document.getElementById('movie_player').playVideo()"
 quality_144p = 10
 quality_244p = 9
 quality_360p = 8
@@ -99,7 +100,7 @@ def record(vid_id, quality,is_auto):
 	option.add_argument("--incognito" )
 	option.add_argument("--enable-quic")
 	option.add_argument('--no-sandbox')
-	browser = webdriver.Chrome(executable_path='../chromedriver', chrome_options=option)
+	browser = webdriver.Chrome(executable_path='/home/cyberlab/Desktop/QOE/chromedriver', chrome_options=option)
 	global freeze_text
 	video_length = ""
 	video_quality = ""
@@ -112,6 +113,12 @@ def record(vid_id, quality,is_auto):
 		try:
 			browser.get("https://www.youtube.com/watch?v="+vid_id)
 			time.sleep(2)
+			
+			
+			#print(browser.execute_script(get_player_state))
+			#browser.execute_script(play_video)
+			#time.sleep(2)
+			#print(browser.execute_script(get_player_state))
 			while browser.execute_script(get_player_state) == -1:
 				continue
 			if is_auto != 1:
