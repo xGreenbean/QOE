@@ -34,7 +34,18 @@ def formatTime(time):
 		seconds = '0' + seconds
 	return str(minutes) + ":" + str(seconds)
 
+def set_quality2(browser,quality):
+	print("yes")
+	browser.find_element_by_class_name("ytp-settings-button").click()
+	# click quality button
+	browser.find_elements_by_class_name("ytp-menuitem-label")[4].click()
+	# select desired quality
+	ActionChains(browser).click(browser.find_elements_by_class_name("ytp-menuitem-label")[quality[0]]).perform()
+	print(ActionChains(browser).click(browser.find_elements_by_class_name("ytp-menuitem-label")))
+	time.sleep(2)
+
 def set_quality(browser,quality,log_file):
+	
 	video_quality = ""
 	b = False
 	while(b==False):
@@ -107,32 +118,32 @@ def record(vid_id, quality,is_auto):
 	if not os.path.exists("Records/"+date_today):
 		os.mkdir("Records/"+ date_today,0o777)
 	log_file = open("Records/"+ date_today + "/LogFile",'a+')
-
+	
 	while copies_counter != num_of_copies:
+		is_running =False
 		event_e.clear()
 		try:
 			browser.get("https://www.youtube.com/watch?v="+vid_id)
 			time.sleep(2)
-			
-			
-			#print(browser.execute_script(get_player_state))
-			#browser.execute_script(play_video)
-			#time.sleep(2)
-			#print(browser.execute_script(get_player_state))
 			while browser.execute_script(get_player_state) == -1:
 				continue
-			if is_auto != 1:
-				video_quality = set_quality(browser,quality,log_file)
-			else:
-				video_quality = browser.execute_script(get_Playback_quality) 
 			
+			if is_auto != 1:
+				set_quality2(browser,quality)
+				print("hello")
+				video_quality = browser.execute_script(get_Playback_quality)
+				if(video_quality != quality[1]):
+					raise Exception('quality isnt matching')
+
 			t = threading.Thread(target=sniffing,args=[browser])
 			t.start()
+			is_running = True
 			while not event_e.is_set():
 				if browser.execute_script(get_Loaded_Fraction) == 1:
 					event_e.set()
 					finish_capture_time = datetime.now()
 					video_length = formatTime(browser.execute_script(get_duration))
+			print("hereeee")
 
 			t.join()
 			time.sleep(3)
@@ -156,7 +167,8 @@ def record(vid_id, quality,is_auto):
 		except Exception as e:
 			log_file.write(str(e) +"\n")
 			event_e.set()
-			t.join()
+			if is_running == True:
+				t.join()
 			
 	
 	browser.close()
@@ -193,6 +205,7 @@ def main():
 					vid_id = user_vid
 				for quality in quality_list:
 					record(vid_id, quality,is_auto)
+					
 	except KeyboardInterrupt:
 		sys.exit(1)
 if __name__ == "__main__":
