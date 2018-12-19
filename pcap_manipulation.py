@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 
 rootdir = os.getcwd()
 video_samples = []
-SAMPLE_SIZE = 25
+SAMPLE_SIZE = 600
 
 class video_sample:
     def __init__(self, data, labels):
-        self.data = preprocessing.scale(data)
+        self.data = data
         self.labels = [0, 0, 0, 0, 0, 1]
         if labels == 'tiny':
             self.labels = [0, 0, 0, 0, 0, 1]
@@ -43,7 +43,7 @@ for subdir, dirs, files in os.walk(rootdir):
 
 
 # Parameters
-learning_rate = 0.01
+learning_rate = 0.02
 training_epochs = 1000
 batch_size = 128
 display_step = 50

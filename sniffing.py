@@ -26,6 +26,7 @@ freeze_text = ""
 event_e = threading.Event()
 event_freeze = threading.Event()
 date_today =  time.strftime("%c")
+
 def formatTime(time):
 	time = round(time);
 	minutes = math.floor(time/60)
