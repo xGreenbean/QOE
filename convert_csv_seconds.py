@@ -25,7 +25,7 @@ while copies_counter != copies+1:
 	video_list = os.listdir(pcap_path + "/.")
 	for vid_id in video_list:
 		for quality in quality_list:
-			 f.write("tshark -nr ~/Desktop/QOE/"+ pcap_path2 + "/" + vid_id + "/" + quality + "/" + vid_id +"Vudp.cap -q -z io,stat,0.5,BYTES | grep -P "'"\d{1,2}\.{1}\d{1,2}\s+<>\s+\d{1,2}\.{1}\d{1,2}\s*\|\s+\d+"'"| awk -F '[ |]+' '{print $2"','"($5*8)}' > ~/Desktop/QOE/" + pcap_path2 + "/" + vid_id + "/" + quality + "/" +vid_id+ ".csv\n")
+			 f.write("tshark -nr ~/Desktop/QOE/"+ pcap_path2 + "/" + vid_id + "/" + quality + "/" + vid_id +"Vudp.cap -q -z io,stat,1,BYTES | grep -P "'"\d+\s+<>\s+\d+\s*\|\s+\d+"'"| awk -F '[ |]+' '{print $2"','"($5*8)}' > ~/Desktop/QOE/" + pcap_path2 + "/" + vid_id + "/" + quality + "/" +vid_id+ ".csv\n")
 
 	copies_counter += 1
 	
