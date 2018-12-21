@@ -10,6 +10,7 @@ get_Playback_quality = "return document.getElementById('movie_player').getPlayba
 get_Playback_quality = "return document.getElementById('movie_player').getPlaybackQuality()"
 get_duration = "return document.getElementById('movie_player').getDuration()"
 get_current_time = "return document.getElementById('movie_player').getCurrentTime()"
+play_video = "return document.getElementById('movie_player').playVideo()"
 quality_144p = 10
 quality_244p = 9
 quality_360p = 8
@@ -26,6 +27,7 @@ freeze_text = ""
 event_e = threading.Event()
 event_freeze = threading.Event()
 date_today =  time.strftime("%c")
+
 def formatTime(time):
 	time = round(time);
 	minutes = math.floor(time/60)
@@ -112,7 +114,7 @@ def record(vid_id, quality,is_auto):
 	option.add_argument("--incognito" )
 	option.add_argument("--enable-quic")
 	option.add_argument('--no-sandbox')
-	browser = webdriver.Chrome(executable_path='../chromedriver', chrome_options=option)
+	browser = webdriver.Chrome(executable_path='/home/cyberlab/Desktop/QOE/chromedriver', chrome_options=option)
 	global freeze_text
 	video_length = ""
 	video_quality = ""
@@ -126,11 +128,13 @@ def record(vid_id, quality,is_auto):
 		try:
 			browser.get("https://www.youtube.com/watch?v="+vid_id)
 			time.sleep(2)
+
 			print("zzzzzzzzzzzzzzzzz")
 			if trsh_counter != tresh_hold:
 				log_file.write("Couldn't record video id:" + vid_id + " with quality:" + quality[1] + "- Tresh hold occur")
 				print("Couldn't record video id:" + vid_id + " with quality:" + quality[1] + "- Tresh hold occur")
 				break
+
 			while browser.execute_script(get_player_state) == -1:
 				continue
 			

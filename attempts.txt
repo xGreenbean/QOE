@@ -1,0 +1,10 @@
+Classification:
+#ATTEMPT 1:
+We have tried to use a Vector of various size of the byte troughoutput in a 1/10
+of a second. we have 6 clasess and achived accuracy of 21% which isnt very good.
+using a deep learning network with softmax + regularization, data is scaled.
+#ATTEMPT 2:
+WE now filtered out non udp traffic and achived an average improvment of 7%.
+#ATTEMPT 3:
+still using NN we get accuracy of 40% when we use seconds
+

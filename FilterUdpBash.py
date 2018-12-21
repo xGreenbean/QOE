@@ -15,8 +15,8 @@ if not os.path.exists("bash_to_csv_files"):
 if not os.path.exists("bash_to_csv_files/" + str(record_name)):
 		os.mkdir("bash_to_csv_files/" + str(record_name),0o777)
 
-f = open("bash_to_csv_files/" + str(record_name) + "/csv_bash.sh",'w+')
-os.chmod("bash_to_csv_files/" + str(record_name) + "/csv_bash.sh",0o777)
+f = open("bash_to_csv_files/" + str(record_name) + "/csv_bashUDP.sh",'w+')
+os.chmod("bash_to_csv_files/" + str(record_name) + "/csv_bashUDP.sh",0o777)
 
 while copies_counter != copies+1:
 	
@@ -25,11 +25,8 @@ while copies_counter != copies+1:
 	video_list = os.listdir(pcap_path + "/.")
 	for vid_id in video_list:
 		for quality in quality_list:
-			 f.write("tshark -nr ~/Desktop/QOE/"+ pcap_path2 + "/" + vid_id + "/" + quality + "/" + vid_id +"Vudp.cap -q -z io,stat,0.5,BYTES | grep -P "'"\d{1,2}\.{1}\d{1,2}\s+<>\s+\d{1,2}\.{1}\d{1,2}\s*\|\s+\d+"'"| awk -F '[ |]+' '{print $2"','"($5*8)}' > ~/Desktop/QOE/" + pcap_path2 + "/" + vid_id + "/" + quality + "/" +vid_id+ ".csv\n")
-
+			 f.write("tshark -nr ~/Desktop/QOE/"+ pcap_path2 + "/" + vid_id + "/" + quality + "/" + vid_id +".cap -Y udp -w " + "~/Desktop/QOE/"+pcap_path2 + "/" + vid_id + "/" + quality + "/" +vid_id+ "Vudp.cap\n")
 	copies_counter += 1
 	
 
 f.close()
-
-

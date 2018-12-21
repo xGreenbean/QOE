@@ -1,0 +1,1 @@
+tshark -nr tmp.pcap -q -z io,stat,1,BYTES | grep -P "\d+\s+<>\s+\d+\s*\|\s+\d+" | awk -F '[ |]+' '{print $2","($5*8)}'
