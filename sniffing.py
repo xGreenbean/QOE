@@ -18,6 +18,7 @@ quality_720p = 6
 quality_1080p = 5
 num_of_copies = 0
 num_of_videos = 0
+tresh_hold = 70
 start_capture_time = datetime.now()
 finish_capture_time = datetime.now()
 test = {}
@@ -104,6 +105,7 @@ def isFreezed(browser):
 
 def record(vid_id, quality,is_auto):
 	copies_counter = 0
+	trsh_counter = 0
 	global finish_capture_time
 	global date_today
 	option = webdriver.ChromeOptions()
@@ -125,9 +127,14 @@ def record(vid_id, quality,is_auto):
 			browser.get("https://www.youtube.com/watch?v="+vid_id)
 			time.sleep(2)
 			print("zzzzzzzzzzzzzzzzz")
+			if trsh_counter != tresh_hold:
+				log_file.write("Couldn't record video id:" + vid_id + " with quality:" + quality[1] + "- Tresh hold occur")
+				print("Couldn't record video id:" + vid_id + " with quality:" + quality[1] + "- Tresh hold occur")
+				break
 			while browser.execute_script(get_player_state) == -1:
 				continue
 			
+
 			if is_auto != 1:
 				set_quality2(browser,quality)
 				print("hello")
@@ -166,9 +173,13 @@ def record(vid_id, quality,is_auto):
 			print("Video id: " + vid_id + "was succesfully captured in quality:" + video_quality)
 		except Exception as e:
 			log_file.write(str(e) +"\n")
-			event_e.set()
+			
 			if is_running == True:
+				event_e.set()
 				t.join()
+			else:
+				trsh_counter +=1
+					
 			
 	
 	browser.close()
