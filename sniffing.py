@@ -114,18 +114,20 @@ def isFreezed(browser):
 			
 def onQualityChange(browser):
 	global qualityChange_text
-	start_qualityChange_time = datetime.now()
+	#start_qualityChange_time = datetime.now()
 	current_time = browser.execute_script(get_current_time)
 	last_quality = browser.execute_script(get_Playback_quality)
-	qualityChange_text += "*Started recording at " + str(start_qualityChange_time) + "With quality: "+ last_quality  +"\n"
+	qualityChange_text += "0 " + last_quality  +"\n"
 	while not event_quality_change.is_set():
 		isChange = browser.execute_script(get_Playback_quality)
 		if isChange != last_quality:
-
-			new_qualityChange_time = datetime.now()
-			current_time = browser.execute_script(get_current_time)
-			qualityChange_text += "started to recoreded in quality: " + last_quality + " at " + str(start_qualityChange_time) +"and finished at: " + str(new_qualityChange_time) + ", Quality change was occured at: " + str(current_time) + " to quality: " + isChange +"\n"
-			start_qualityChange_time = new_qualityChange_time
+			print("Quality change")
+			#new_qualityChange_time = datetime.now()
+			quality_change_time = browser.execute_script(get_current_time)
+			qualityChange_text += str(quality_change_time - current_time) + " " + isChange + "\n" 
+			print(qualityChange_text)
+			#start_qualityChange_time = new_qualityChange_time
+			current_time = quality_change_time
 			last_quality = isChange
 		
 			
@@ -141,7 +143,7 @@ def record(vid_id, quality,is_auto):
 	option.add_argument("--incognito" )
 	option.add_argument("--enable-quic")
 	option.add_argument('--no-sandbox')
-	browser = webdriver.Chrome(executable_path='/home/saimon9852/Desktop/QOE/chromedriver', chrome_options=option)
+	browser = webdriver.Chrome(executable_path='/home/cyberlab/Desktop/QOE/chromedriver', chrome_options=option)
 	global freeze_text
 	global qualityChange_text
 	video_length = ""
@@ -203,11 +205,12 @@ def record(vid_id, quality,is_auto):
 			f.write("Capture time: " + str(total_capture_time) + "\n" + "Video Length: " + video_length + "\n" + freeze_text + "\n" + qualityChange_text +"\n")
 			freeze_text = ""
 			qualityChange_text = ""
-			f.close()
+			
 			if is_auto == 1:
 				f.write("RECORDED IN AUTO MODE")
 				print("Video id: " + vid_id + "was succesfully recored in auto mode")
 			print("Video id: " + vid_id + "was succesfully captured in quality:" + video_quality)
+			f.close()
 		except Exception as e:
 			log_file.write(str(e) +"\n")
 			
