@@ -8,7 +8,7 @@ video_samples = []
 
 
 class VideoSampleHot:
-    def __init__(self, data, labels):
+    def __init__(self, data, labels, 'Hot' = bool ):
         self.data = preprocessing.StandardScaler().fit_transform(data)
         self.labels = [0, 0, 0, 0, 0, 1]
         if labels == 'tiny':
