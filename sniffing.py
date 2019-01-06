@@ -24,8 +24,10 @@ start_capture_time = datetime.now()
 finish_capture_time = datetime.now()
 test = {}
 freeze_text = ""
+qualityChange_text = ""
 event_e = threading.Event()
 event_freeze = threading.Event()
+event_quality_change = threading.Event()
 date_today =  time.strftime("%c")
 
 def formatTime(time):
@@ -78,10 +80,17 @@ def sniffing(browser):
 	start_capture_time = datetime.now()
 	thread_freeze = threading.Thread(target=isFreezed,args=[browser])
 	thread_freeze.start()
+	thread_qualityChange = threading.Thread(target=onQualityChange,args=[browser])
+	thread_qualityChange.start()
 	test = sniff(count = 10000000, stop_filter = lambda p: event_e.is_set())
+	event_quality_change.set()
+	print("got here")
+	thread_qualityChange.join()
+	print("got here 2")
 	event_freeze.set()
 	thread_freeze.join()
 	event_freeze.clear()
+	event_quality_change.clear()
 
 def isFreezed(browser):
 	global freeze_text
@@ -103,7 +112,25 @@ def isFreezed(browser):
 			finish_freeze_time = datetime.now()
 			freeze_text += "there was a freeze for " + str(finish_freeze_time - start_freeze_time) +" ,Freeze started in time: " + str(current_time) + " and finished in time: " + str(no_freeze) +"\n"
 			
+def onQualityChange(browser):
+	global qualityChange_text
+	start_qualityChange_time = datetime.now()
+	current_time = browser.execute_script(get_current_time)
+	last_quality = browser.execute_script(get_Playback_quality)
+	qualityChange_text += "*Started recording at " + str(start_qualityChange_time) + "With quality: "+ last_quality  +"\n"
+	while not event_quality_change.is_set():
+		isChange = browser.execute_script(get_Playback_quality)
+		if isChange != last_quality:
+
+			new_qualityChange_time = datetime.now()
+			current_time = browser.execute_script(get_current_time)
+			qualityChange_text += "started to recoreded in quality: " + last_quality + " at " + str(start_qualityChange_time) +"and finished at: " + str(new_qualityChange_time) + ", Quality change was occured at: " + str(current_time) + " to quality: " + isChange +"\n"
+			start_qualityChange_time = new_qualityChange_time
+			last_quality = isChange
 		
+			
+
+	
 
 def record(vid_id, quality,is_auto):
 	copies_counter = 0
@@ -114,8 +141,9 @@ def record(vid_id, quality,is_auto):
 	option.add_argument("--incognito" )
 	option.add_argument("--enable-quic")
 	option.add_argument('--no-sandbox')
-	browser = webdriver.Chrome(executable_path='/home/cyberlab/Desktop/QOE/chromedriver', chrome_options=option)
+	browser = webdriver.Chrome(executable_path='/home/saimon9852/Desktop/QOE/chromedriver', chrome_options=option)
 	global freeze_text
+	global qualityChange_text
 	video_length = ""
 	video_quality = ""
 	if not os.path.exists("Records/"+date_today):
@@ -130,7 +158,7 @@ def record(vid_id, quality,is_auto):
 			time.sleep(2)
 
 			print("zzzzzzzzzzzzzzzzz")
-			if trsh_counter != tresh_hold:
+			if trsh_counter == tresh_hold:
 				log_file.write("Couldn't record video id:" + vid_id + " with quality:" + quality[1] + "- Tresh hold occur")
 				print("Couldn't record video id:" + vid_id + " with quality:" + quality[1] + "- Tresh hold occur")
 				break
@@ -160,20 +188,25 @@ def record(vid_id, quality,is_auto):
 			time.sleep(3)
 			total_capture_time = finish_capture_time - start_capture_time
 			copies_counter +=1
+			if is_auto == 1:
+				video_quality = "AUTO"
 			if not os.path.exists("Records/"+date_today +"/Copy_" + str(copies_counter)):
 				os.makedirs("Records/"+date_today +"/Copy_" + str(copies_counter))
 			if not os.path.exists("Records/"+date_today +"/Copy_" + str(copies_counter) + "/" + vid_id):
 				os.makedirs("Records/"+date_today +"/Copy_"+ str(copies_counter) + "/" + vid_id)
 			if not os.path.exists("Records/"+date_today +"/Copy_" + str(copies_counter) + "/" + vid_id + "/" +video_quality):
 				os.makedirs("Records/"+date_today +"/Copy_" + str(copies_counter) + "/" +vid_id + "/" +video_quality)
+
 			print(freeze_text)
 			wrpcap("Records/"+date_today +"/Copy_" + str(copies_counter) + "/"+ vid_id + "/" +video_quality + "/" + vid_id +".cap", test)
 			f = open("Records/"+date_today +"/Copy_" + str(copies_counter) + "/"+ vid_id + "/" +video_quality + "/"+ "feature_List",'a+')
-			f.write("Capture time: " + str(total_capture_time) + "\n" + "Video Length: " + video_length + "\n" + freeze_text + "\n")
+			f.write("Capture time: " + str(total_capture_time) + "\n" + "Video Length: " + video_length + "\n" + freeze_text + "\n" + qualityChange_text +"\n")
 			freeze_text = ""
+			qualityChange_text = ""
 			f.close()
 			if is_auto == 1:
 				f.write("RECORDED IN AUTO MODE")
+				print("Video id: " + vid_id + "was succesfully recored in auto mode")
 			print("Video id: " + vid_id + "was succesfully captured in quality:" + video_quality)
 		except Exception as e:
 			log_file.write(str(e) +"\n")
@@ -219,7 +252,11 @@ def main():
 				if what_vid == 2:
 					vid_id = user_vid
 				for quality in quality_list:
-					record(vid_id, quality,is_auto)
+					if is_auto == 1:
+						record(vid_id, quality,is_auto)
+						break
+					else:
+						record(vid_id, quality,is_auto)
 					
 	except KeyboardInterrupt:
 		sys.exit(1)
