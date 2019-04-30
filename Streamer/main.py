@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 from scapy.all import *
-my_dir = os.listdir("cuttings")
 
 #holds the streams in the 5 seconds interval.
 streams = {}
@@ -10,7 +9,8 @@ ott_streams = []
 
 #list of pcap file name's.
 cuttings = []
-
+stream_cuttings = []
+connenction_open_times = []
 #TCP flags
 FIN = 0x01
 SYN = 0x02
@@ -21,40 +21,34 @@ URG = 0x20
 ECE = 0x40
 CWR = 0x80
 
+original_pcap = rdpcap("iphone7_auto_04_19_id_1.pcap")
+start_time = original_pcap[0].time
+original_pcap = None
+
+my_dir = os.listdir("cuttings")
 for pcap_file_path in my_dir:
-    cuttings.append(rdpcap("cuttings\\" + pcap_file_path))
+    stream_cuttings.append(cuttings)
+    cuttings = []
+    for pcap_stream_cuttings_files in os.listdir("cuttings\\" + pcap_file_path):
+        if pcap_stream_cuttings_files.startswith('out'):
+            cuttings.append(rdpcap("cuttings\\" + pcap_file_path + "\\" + pcap_stream_cuttings_files))
 
-for index, pcap in enumerate(cuttings):
-    print(pcap[0][IP].src)
-    for pkt in pcap:
-        pkt_key = [pkt[IP].src, pkt[IP].dst, pkt.sport, pkt.dport]
-        if streams.get(repr(pkt_key)) is not None:
-            streams.get(repr(pkt_key)).append(pkt)
-        else:
-            streams[repr(pkt_key)] = [pkt]
-
-    for key in streams:
-        total_payloads = 0
-        for pkt in streams[key]:
-            pkt[IP].src
-            total_payloads += len(pkt)
-
-        #Bingo!
-        if total_payloads > 1000000:
-            # print repr(key)
-            # print total_payloads
-            if key not in ott_streams:
-                ott_streams.append(key)
-
-        #check locality in time
-        #for now i have decided to drop it.
-        #be careful with adding lists or representaions of strings
-            # for pkt in pcap:
-            #     #connection was opened
-            #     if(pkt[TCP].flags and ACK and SYN):
-            #         if [pkt[IP].src, pkt[IP].dst, pkt.sport, pkt.dport] not in ott_streams:
-            #             ott_streams.append([pkt[IP].src, pkt[IP].dst, pkt.sport, pkt.dport])
-        #add to data set one minute forward and one minute backwards
-
-    streams = {}
-print(ott_streams )
+    for stream in stream_cuttings:
+        if len(stream) > 0:
+            if len(stream[0]) > 0:
+                print((stream[0][0].time - start_time))
+        for pcap in stream:
+            total_payloads = 0
+            if len(pcap) > 0:
+                pkt_key = [pcap[0][IP].src, pcap[0].sport, pcap[0][IP].dst, pcap[0].dport]
+            for pkt in pcap:
+                total_payloads += len(pkt)
+                #Bingo!
+                if total_payloads > 100000:
+                    if pkt_key not in ott_streams:
+                        ott_streams.append(pkt_key)
+                    # pkt_key[3] = 443
+                    # if pkt_key not in ott_streams:
+                    #     ott_streams.append(pkt_key)
+        streams = {}
+print(ott_streams)
