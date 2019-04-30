@@ -25,6 +25,7 @@ for pcap_file_path in my_dir:
     cuttings.append(rdpcap("cuttings\\" + pcap_file_path))
 
 for index, pcap in enumerate(cuttings):
+    print(pcap[0][IP].src)
     for pkt in pcap:
         pkt_key = [pkt[IP].src, pkt[IP].dst, pkt.sport, pkt.dport]
         if streams.get(repr(pkt_key)) is not None:
@@ -56,4 +57,4 @@ for index, pcap in enumerate(cuttings):
         #add to data set one minute forward and one minute backwards
 
     streams = {}
-print ott_streams
+print(ott_streams )
