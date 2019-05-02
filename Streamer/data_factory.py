@@ -1,5 +1,5 @@
 import os
-from Stream import Stream
+from SegmentContainer import SegmentContainer
 from scapy.all import *
 
 stream_cuttings = []
@@ -16,8 +16,9 @@ def produce():
 
     streams = []
     for cut in stream_cuttings:
-        streams.append(Stream(cut))
+        streams.append(SegmentContainer(cut))
     return streams
+
 
 def getdownstream(scapy_pcap, client_ip):
     down_stream_pcap = [pkt for pkt in scapy_pcap if pkt[IP].dst == client_ip]
