@@ -1,60 +1,60 @@
 #! /usr/bin/env python
 from scapy.all import *
-my_dir = os.listdir("cuttings")
+import data_factory
+from SegmentContainerManipulation import add_sessions_by_server
+from SegmentContainerManipulation import add_sessions_by_time
 
-#holds the streams in the 5 seconds interval.
-streams = {}
 
-#quaduple that represent a video-related stream.
-ott_streams = []
 
-#list of pcap file name's.
-cuttings = []
+client_ip = '10.185.33.245'
+original_pcap = rdpcap("iphone7_auto_04_19_id_1.pcap")
+real_start_time = original_pcap[0].time
+start_time = original_pcap[0].time
+end_time = original_pcap[-1].time
+original_pcap = None
 
-#TCP flags
-FIN = 0x01
-SYN = 0x02
-RST = 0x04
-PSH = 0x08
-ACK = 0x10
-URG = 0x20
-ECE = 0x40
-CWR = 0x80
+time_interval = end_time - start_time
 
-for pcap_file_path in my_dir:
-    cuttings.append(rdpcap("cuttings\\" + pcap_file_path))
+unclassified_streams = data_factory.produce()
+total_payloads = 0
+video_treshold = 100000
+bingo = True
+video_related_streams = set([])
 
-for index, pcap in enumerate(cuttings):
-    print(pcap[0][IP].src)
-    for pkt in pcap:
-        pkt_key = [pkt[IP].src, pkt[IP].dst, pkt.sport, pkt.dport]
-        if streams.get(repr(pkt_key)) is not None:
-            streams.get(repr(pkt_key)).append(pkt)
-        else:
-            streams[repr(pkt_key)] = [pkt]
 
-    for key in streams:
+# for index, stream in enumerate(streams):
+#     if len(stream.curr_splinter) > 0:
+#         print(stream.curr_splinter[0].time - start_time)
+#     else:
+#         print(stream.splinters_path)
+
+for x in range(int(time_interval / 5)):
+    for index, stream in enumerate(unclassified_streams):
         total_payloads = 0
-        for pkt in streams[key]:
-            pkt[IP].src
-            total_payloads += len(pkt)
+        flag = 0
+        while flag <= 1:
+            curr_stream = stream.curr_splinter
+            if curr_stream is None:
+                flag = 2
+                continue
+            # print(stream.to_string(), curr_stream[0].time - start_time, 'bla')
+            if abs(curr_stream[0].time - start_time) <= 5:
 
-        #Bingo!
-        if total_payloads > 1000000:
-            # print repr(key)
-            # print total_payloads
-            if key not in ott_streams:
-                ott_streams.append(key)
+                for packet in data_factory.getdownstream(curr_stream, client_ip):
+                    if (packet.time >= start_time) and (packet.time <= start_time + 5):
+                        total_payloads += len(packet)
 
-        #check locality in time
-        #for now i have decided to drop it.
-        #be careful with adding lists or representaions of strings
-            # for pkt in pcap:
-            #     #connection was opened
-            #     if(pkt[TCP].flags and ACK and SYN):
-            #         if [pkt[IP].src, pkt[IP].dst, pkt.sport, pkt.dport] not in ott_streams:
-            #             ott_streams.append([pkt[IP].src, pkt[IP].dst, pkt.sport, pkt.dport])
-        #add to data set one minute forward and one minute backwards
+                if total_payloads >= video_treshold:
+                    video_related_streams.add(stream.to_string())
+                    add_sessions_by_server(unclassified_streams, stream, video_related_streams)
+                    add_sessions_by_time(unclassified_streams, stream, video_related_streams)
+                    unclassified_streams.remove(stream)
+                    flag = 2
 
-    streams = {}
-print(ott_streams )
+            if curr_stream[0].time - start_time <= 0:
+                stream.next()
+            flag += 1
+    start_time += 5
+
+for stream_string in video_related_streams:
+    print(stream_string)
