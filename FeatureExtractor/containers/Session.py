@@ -1,59 +1,62 @@
+from containers.Flow import *
 
 """
-FIX:
-"""
-
-"""
-Class fields:
-sess - Session DataFrame
+Class Session
+    define session by 5-tuple: Protocol, ip,port source and destination
+    In this class we filter all the packets that belongs to the session,
+    then we separate them to flows, upstreams and downstreams
 """
 
 class Session:
 
-    def __init__(self, srcPort, dstPort, srcIp, dstIp, csvFile):
+    def __init__(self, protocol,srcPort, dstPort, srcIp, dstIp, csvFile):
         self.srcPort = srcPort
         self.srcIp = srcIp
         self.dstIp = dstIp
         self.dstPort = dstPort
-        self.protocol = ""
-        self.all_packets = self.get_rows_session(csvFile)
-        self.uploads, self.downloads = self.find_uploads_downloads()
+        self.protocol = protocol
+        if protocol == "TCP":
+            self.all_packets = self.get_all_tcps(csvFile)
+        elif protocol == "UDP":
+            self.all_packets = self.get_all_udps(csvFile)
+        f_up, f_down = self.find_uploads_downloads()
+        self.flow_up = Flow(f_up)
+        self.flow_down = Flow(f_down)
 
-    def get_rows_session(self, csv_file):
-        row_list = []
-        for i in range(csv_file['ip.src'].count()):
-            src_ip = csv_file['ip.src'][i]
-            dst_ip = csv_file['ip.dst'][i]
-            tcp_src_port = csv_file['tcp.srcport'][i]
-            tcp_dst_port = csv_file['tcp.dstport'][i]
-            udp_src_port = csv_file['udp.srcport'][i]
-            udp_dst_port = csv_file['udp.dstport'][i]
-            if True:
-                if (src_ip == self.srcIp and dst_ip == self.dstIp) or (src_ip == self.dstIp and dst_ip == self.srcIp):
-                    print(str(udp_src_port)[:-2] + " " + self.srcPort)
-                    if (str(tcp_src_port)[:-2] == self.srcPort and str(tcp_dst_port)[:-2] == self.dstPort)\
-                                              or (str(tcp_src_port)[:-2] == self.dstPort and str(tcp_dst_port)[:-2] == self.srcPort):
-                        self.protocol = "TCP"
-                        row_list.append(csv_file.loc[i])
-                    elif (str(udp_src_port)[:-2] == self.srcPort and str(udp_dst_port)[:-2] == self.dstPort) or \
-                            (str(udp_src_port)[:-2] == self.dstPort and str(udp_dst_port)[:-2] == self.srcPort):
-                        self.protocol = "UDP"
-                        row_list.append(csv_file.loc[i])
-        # print(numUploads)
-        return row_list
+    """
+        The function get all the packet in the pcap file, filters the right ip's and then filter all the packets 
+        with the right ports values in tcp connection and return the filtered pandas rows 
+    """
+    def get_all_tcps(self, csv_file):
+        filter_ips = self.get_filtered_ips(csv_file)
+        tcp_packets = filter_ips.loc[(filter_ips['tcp.srcport'].isin([self.srcPort]) & filter_ips['tcp.dstport'].isin([self.dstPort]))
+            | (filter_ips['tcp.srcport'].isin([self.dstPort]) & filter_ips['tcp.dstport'].isin([self.srcPort]))]
+        return tcp_packets
 
+    """
+        The function get all the packet in the pcap file, filters the right ip's and then filter all the packets 
+        with the right ports values in udp connection and return the filtered pandas rows 
+    """
+    def get_all_udps(self,csv_file):
+        filter_ips = self.get_filtered_ips(csv_file)
+        udp_packets = filter_ips.loc[(filter_ips['udp.srcport'].isin([self.srcPort]) & filter_ips['udp.dstport'].isin([self.dstPort]))
+                     | (filter_ips['udp.srcport'].isin([self.dstPort]) & filter_ips['udp.dstport'].isin([self.srcPort]))]
+        return udp_packets
 
+    """
+        This function get a pandas object csv_file and return all the rows with the same ip src and dst defining the
+         session (A->B,B->A)
+    """
+    def get_filtered_ips(self,csv_file):
+        is_ip = ((csv_file['ip.src'] == self.srcIp) & (csv_file['ip.dst'] == self.dstIp)) | \
+                ((csv_file['ip.src'] == self.dstIp) & (csv_file['ip.dst'] == self.srcIp))
+        return csv_file[is_ip]
+
+    """
+        This function separate all session packets to up flows and down flows based on ip.src defined to the session
+    """
     def find_uploads_downloads(self):
-        uploads = []
-        downloads = []
-        for i in range(len(self.all_packets)):
-            if str(self.all_packets[i]['ip.src']) == self.srcIp:
-                uploads.append(self.all_packets[i])
-            else:
-                downloads.append(self.all_packets[i])
+        pd = self.all_packets
+        uploads = pd[pd['ip.src'] == self.srcIp]
+        downloads = pd[pd['ip.src'] == self.dstIp]
         return uploads, downloads
-
-
-
-
-
