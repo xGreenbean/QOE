@@ -350,14 +350,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20327869" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20327869" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.1738661" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.1738661" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -376,7 +375,8 @@
     <MESSAGE value="added scripts to delete empty pcap files" />
     <MESSAGE value="added Stream class&#10;Stream is container for Stream pieces" />
     <MESSAGE value="added data factory file,&#10;scripts for pulling data" />
-    <option name="LAST_COMMIT_MESSAGE" value="added data factory file,&#10;scripts for pulling data" />
+    <MESSAGE value="add 2 functions for stream manipulations" />
+    <option name="LAST_COMMIT_MESSAGE" value="add 2 functions for stream manipulations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
