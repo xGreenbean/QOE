@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6fadfb37-bb5c-4076-8390-c110886e46a3" name="Default Changelist" comment="deleted empty pcaps">
-      <change afterPath="$PROJECT_DIR$/SegmentContainer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SegmentContainerManipulation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Stream.py" beforeDir="false" afterPath="$PROJECT_DIR$/Stream.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_factory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="6fadfb37-bb5c-4076-8390-c110886e46a3" name="Default Changelist" comment="proof of concept, now works more or less hopefully" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="44" column="53" lean-forward="true" selection-start-line="44" selection-start-column="53" selection-end-line="44" selection-end-column="53" />
+            <state relative-caret-position="779">
+              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
               <folding>
                 <element signature="e#23#46#0" expanded="true" />
               </folding>
@@ -336,7 +328,49 @@
       <option name="project" value="LOCAL" />
       <updated>1556799392904</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="add 2 functions for stream manipulations">
+      <created>1556816574325</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1556816574325</updated>
+    </task>
+    <task id="LOCAL-00006" summary="changed to_string()&#10;moved error handling of null packets to be handled in the preproccesing phase">
+      <created>1556816629590</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1556816629590</updated>
+    </task>
+    <task id="LOCAL-00007" summary="added some scrips to check accuracy">
+      <created>1556816654492</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1556816654492</updated>
+    </task>
+    <task id="LOCAL-00008" summary="created segmentcontainer for holding stream segments">
+      <created>1556816685931</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1556816685931</updated>
+    </task>
+    <task id="LOCAL-00009" summary="segment manipulation functions">
+      <created>1556816735923</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1556816735923</updated>
+    </task>
+    <task id="LOCAL-00010" summary="proof of concept, now works more or less hopefully">
+      <created>1556816783743</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1556816783743</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TodoView" selected-index="3">
@@ -356,7 +390,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.1738661" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.1738661" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -376,7 +410,12 @@
     <MESSAGE value="added Stream class&#10;Stream is container for Stream pieces" />
     <MESSAGE value="added data factory file,&#10;scripts for pulling data" />
     <MESSAGE value="add 2 functions for stream manipulations" />
-    <option name="LAST_COMMIT_MESSAGE" value="add 2 functions for stream manipulations" />
+    <MESSAGE value="changed to_string()&#10;moved error handling of null packets to be handled in the preproccesing phase" />
+    <MESSAGE value="added some scrips to check accuracy" />
+    <MESSAGE value="created segmentcontainer for holding stream segments" />
+    <MESSAGE value="segment manipulation functions" />
+    <MESSAGE value="proof of concept, now works more or less hopefully" />
+    <option name="LAST_COMMIT_MESSAGE" value="proof of concept, now works more or less hopefully" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -452,8 +491,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="44" column="53" lean-forward="true" selection-start-line="44" selection-start-column="53" selection-end-line="44" selection-end-column="53" />
+        <state relative-caret-position="779">
+          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
           <folding>
             <element signature="e#23#46#0" expanded="true" />
           </folding>
