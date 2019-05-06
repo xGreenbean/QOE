@@ -23,7 +23,6 @@ class FeaturesCalculation:
         """ Get client hello """
         fu_df = self.flow_up.get_df()
         self.client_hello_pkt = fu_df[fu_df['tls.handshake.extensions_server_name'].notnull()]
-
         """ Get SYN packet """
         self.syn_pkt = fu_df[(fu_df['tcp.flags.syn'] == 1) & (fu_df['tcp.flags.ack'] == 0)]
 
@@ -218,11 +217,10 @@ class FeaturesCalculation:
         return self.flow_up.num_keep_alive()
 
     """
-    # SSLv3/TLS versions
-    SSL3_V = 0x0300
-    TLS1_V = 0x0301
-    TLS11_V = 0x0302
-    TLS12_V = 0x0303
+    # TLS versions
+    TLS1_V = 0x00000301
+    TLS11_V = 0x00000302
+    TLS12_V = 0x00000303
 
     ssl3   tls1  tls11 tls12
     [0,    0,    0,    1]
@@ -232,8 +230,6 @@ class FeaturesCalculation:
     def fSSLv(self):
         if not(self.client_hello_pkt.empty):
             ssl_version = self.client_hello_pkt['tls.handshake.version'].iloc[0]
-            if issubclass(type(ssl_version), str):
-                ssl_version = int(ssl_version,0)
             return ssl_version
         return 0
 
