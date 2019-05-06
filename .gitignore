@@ -3,3 +3,6 @@ archive
 test.py
 Streamer/venv
 Streamer/.idea
+Streamer/__pycache__/
+bash_to_csv_files
+bash_to_csv_scripts
