@@ -33,17 +33,17 @@ def fill_sessions_dir(data_set_path):
                     curr_path_sessions = os.path.join(data_set_path, dirs, subdirs,'sessions')
                     if len(os.listdir(curr_path_sessions)) == 0:
                         print(curr_dir)
-                        for pcap_file in os.listdir(curr_dir):
-                            if pcap_file.endswith('pcap'):
-                                curr_pcap_path = os.path.join(curr_dir,pcap_file)
-                                os.system(splitcap_path + ' -r ' + '"' + curr_pcap_path +
-                                          '"' + ' -o ' + '"' + curr_path_sessions + '"')
+                        # for pcap_file in os.listdir(curr_dir):
+                        #     if pcap_file.endswith('pcap'):
+                        #         curr_pcap_path = os.path.join(curr_dir,pcap_file)
+                        #         os.system(splitcap_path + ' -r ' + '"' + curr_pcap_path +
+                        #                   '"' + ' -o ' + '"' + curr_path_sessions + '"')
 
 # create directory for every session and move it there
 def create_dirs_for_sessions(data_set_path):
     for dirName, subdirList, fileList in os.walk(data_set_path):
         #if there is no session directory
-        if dirName.find('sessions') != -1:
+        if os.path.split(dirName)[-1] == ('sessions') != -1:
             # print('Found directory: %s' % dirName)
             for fname in fileList:
                 if not os.path.exists(os.path.join(dirName, fname.split('.')[0])):
@@ -61,10 +61,8 @@ def split_sessions_by_time(data_set_path, split_interval):
                 #check for exact path
                 pcap_file_path = os.path.join(dirName, fname)
                 out_path = os.path.join(dirName, 'splits', 'out.pcap')
-                # print(pcap_file_path)
-                # print(out_path)
                 if len(os.listdir(os.path.join(dirName, 'splits'))) == 0:
-                     os.system('editcap -i ' + str(split_interval) + ' ' + '"' + pcap_file_path + '"'
+                      os.system('editcap -i ' + str(split_interval) + ' ' + '"' + pcap_file_path + '"'
                                ' "' + out_path + '"')
 
 
@@ -85,6 +83,5 @@ def delete_empty_pcaps(data_set_path):
             for fname in fileList:
                 if len(rdpcap(os.path.join(dirName,fname))) == 0:
                     os.remove(os.path.join(dirName,fname))
-
 
 
