@@ -2,6 +2,8 @@ import os
 global splitcap_path
 import shutil
 from scapy.all import *
+#data set format
+# dataset/OTT/id/sessions/[TCP/UDP]/splits/
 
 # data_set_path = "C:\Users\ehud\Desktop\dataset"
 data_set_path = "/home/cyberlab/Desktop/dataset"
