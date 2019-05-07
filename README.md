@@ -11,3 +11,5 @@ list of youtube videos , 20 videos that have 140p-1080 quality.
 log files for logging exceptions from sniffing.py
 # archive temp
 old stuff that are no longer used
+# Streamer
+a light weight classifier for classifying TCP/UDP streams to Video related/non video related classes
