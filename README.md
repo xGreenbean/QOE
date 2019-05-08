@@ -14,17 +14,17 @@ old stuff that are no longer used
 # Streamer
 a light weight classifier for classifying TCP/UDP streams to Video related/non video related classes
 #Dataset configuration
-dataset/
-(ott,phone) directory/
-sample1, sample2,.../
-sample_pcap.pcap
-sample_video.mp4
-SNI.csv
-Sessions
-Sessions/
-session1, session2 ...
-session1/
-session_pcap.pcap
-splits
-splits/
-session1_first_split.pcap, session1_second_split.pcap
+dataset/ \n
+(ott,phone) directory/ \n
+sample1, sample2,.../ \n
+sample_pcap.pcap \n
+sample_video.mp4 \n
+SNI.csv \n 
+Sessions \n
+Sessions/ \n
+session1, session2 ... \n
+session1/ \n
+session_pcap.pcap \n
+splits \n
+splits/ \n
+session1_first_split.pcap, session1_second_split.pcap \n
