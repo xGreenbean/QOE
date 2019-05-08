@@ -2,11 +2,12 @@ import os
 global splitcap_path
 import shutil
 from scapy.all import *
+import pandas as pd
 #data set format
 # dataset/OTT/id/sessions/[TCP/UDP]/splits/
 
 # data_set_path = "C:\Users\ehud\Desktop\dataset"
-data_set_path = "/home/cyberlab/Desktop/dataset"
+data_set_path = "/home/ehud/Desktop/dataset"
 splitcap_path = "C:\\Users\\ehud\\Desktop\\SplitCap_2-1\\Splitcap.exe"
 
 
@@ -84,4 +85,13 @@ def delete_empty_pcaps(data_set_path):
                 if len(rdpcap(os.path.join(dirName,fname))) == 0:
                     os.remove(os.path.join(dirName,fname))
 
+def remove_duplicates_csv(data_set_path):
+    for dirName, subdirList, fileList in os.walk(data_set_path):
+        if dirName.split(os.sep)[-1].startswith('id_'):
+            for fname in fileList:
+                if fname.endswith('csv'):
+                    df = pd.read_csv(os.path.join(dirName,fname), sep=',')
+                    df = df.filter(['Address A', 'Port A', 'Address B', 'Port B'])
+                    df.drop_duplicates(subset=None, inplace=True)
+                    df.to_csv(os.path.join(dirName,fname))
 
