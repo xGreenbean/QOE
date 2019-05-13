@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 from scapy.all import *
+<<<<<<< Updated upstream
 my_dir = os.listdir("cuttings")
 
 #holds the streams in the 5 seconds interval.
@@ -58,3 +59,15 @@ for index, pcap in enumerate(cuttings):
 
     streams = {}
 print(ott_streams )
+=======
+import data_factory
+from SegmentContainerManipulation import add_sessions_by_server
+from SegmentContainerManipulation import add_sessions_by_time
+from Activity import Activity
+load_layer("tls")
+
+pcap_path = "/home/cyberlab/Desktop/dataset/iphone youtube/id_2/iphone7_auto_04_19_id_2.pcap"
+scapy_pcap = rdpcap(pcap_path)
+scapy_pcap[0].time
+
+>>>>>>> Stashed changes
