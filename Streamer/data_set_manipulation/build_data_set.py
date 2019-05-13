@@ -93,5 +93,5 @@ def remove_duplicates_csv(data_set_path):
                     df = pd.read_csv(os.path.join(dirName,fname), sep=',')
                     df = df.filter(['Address A', 'Port A', 'Address B', 'Port B'])
                     df.drop_duplicates(subset=None, inplace=True)
-                    df.to_csv(os.path.join(dirName,fname))
+                    df.to_csv(os.path.join(dirName,fname), index=False)
 

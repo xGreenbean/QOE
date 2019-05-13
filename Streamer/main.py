@@ -23,7 +23,7 @@ for activity in activities:
     end_time = activity.get_end_time()
     time_interval = end_time - start_time
     total_payloads = 0
-    video_treshold = 1000
+    video_treshold = 5000
     video_related_streams = set([])
 
     for x in range(int(time_interval / 5)):
@@ -54,4 +54,3 @@ for activity in activities:
 
     for stream_string in video_related_streams:
         print(stream_string)
-    print(activity.path)
