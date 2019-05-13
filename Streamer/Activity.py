@@ -6,7 +6,7 @@ from data_set_manipulation.SessionsPath import SessionsPath
 
 class Activity(object):
     def __init__(self, activity_path):
-        self.path = activity_path.get_pcap_path()
+        self.activity_path = activity_path
         self.streams = []
         self.stream_paths = []
         self.pcap = rdpcap(activity_path.get_pcap_path())

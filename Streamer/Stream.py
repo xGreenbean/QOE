@@ -15,4 +15,4 @@ class Stream(object):
         return self.connection_opening_time
 
     def to_string(self):
-        return "'" + self.ip_src + "' " + str(self.port_src) + " '" +  self.ip_dst + "' " + str(self.port_dst)
+        return self.ip_src + " " + str(self.port_src) + " " +  self.ip_dst + " " + str(self.port_dst)
