@@ -41,13 +41,12 @@ class Interaction:
                         [curr_5ple[0], curr_5ple[3], curr_5ple[4], curr_5ple[1], curr_5ple[2]] not in sessions_list:
                         sessions_list.append(curr_5ple)
                         self.sessions.append(Session(curr_5ple[0], curr_5ple[2],
-                                                     curr_5ple[4], curr_5ple[1], curr_5ple[3], pcap_df))
+                                                     curr_5ple[4], curr_5ple[1], curr_5ple[3], self.pcap_df))
         return self.sessions
 
-
-pcap_df = pd.read_csv('/home/cyberlab/Desktop/dataset/iphone youtube/id_1/iphone7_auto_04_19_id_1.csv')
-
-ott = Interaction(pcap_df)
-
-streamer = Streamer(ott, 5, 1,  500000)
-streamer.get_video_related_sessions()
+    def get_session_values(self):
+        self.get_sessions()
+        values = []
+        for sess in self.sessions:
+            values.append([sess.srcIp, sess.srcPort, sess.dstIp, sess.dstPort] )
+        return values
