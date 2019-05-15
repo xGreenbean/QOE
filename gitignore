@@ -8,3 +8,4 @@ bash_to_csv_scripts
 archive
 /FeatureExtractor/__pycache__
 /FeatureExtractor/containers/__pycache__
+/FeatureExtractor/.idea
