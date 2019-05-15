@@ -48,5 +48,5 @@ class Interaction:
         self.get_sessions()
         values = []
         for sess in self.sessions:
-            values.append([sess.srcIp, sess.srcPort, sess.dstIp, sess.dstPort] )
+            values.append([sess.srcIp, sess.srcPort, sess.dstIp, sess.dstPort])
         return values
