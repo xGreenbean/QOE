@@ -1,4 +1,5 @@
-from containers.Interaction import *
+from Statistics.StreamerStatistics import *
+
 """
 Class Streamer
     holds an interaction, build for functions 'get_video_related_sessions'
@@ -10,10 +11,10 @@ Class Streamer
 """
 
 
-class Streamer:
+class Streamer(StreamerStatistics):
     def __init__(self, interaction, delta_s, delta_t, threshold_p):
+        super(Streamer, self).__init__()
         self.interaction = interaction
-        self.video_related_sessions = []
         self.delta_s = delta_s
         self.delta_t = delta_t
         self.threshold_p = threshold_p
@@ -40,6 +41,7 @@ class Streamer:
                             break
                     if payloads >= self.threshold_p:
                         if sess not in self.video_related_sessions:
+                            self.caught_in_threshold.append(sess)  # for statistics
                             self.video_related_sessions.append(sess)
                             self.add_time_related_sessions(sess)
                             self.add_server_related_sessions(sess)
@@ -54,6 +56,7 @@ class Streamer:
                     sess.dstPort == 443:
                 if sess not in self.video_related_sessions:
                     self.video_related_sessions.append(sess)
+                    self.caught_in_server.append(sess)
 
     """ add sessions to video_related_sessions by server where opening_time is close"""
     def add_time_related_sessions(self, video_session):
@@ -61,3 +64,17 @@ class Streamer:
             if abs(sess.connection_opening_time - video_session.connection_opening_time) < self.delta_t:
                 if sess not in self.video_related_sessions:
                     self.video_related_sessions.append(sess)
+                    self.caught_in_time.append(sess)
+
+    def get_video_related_sessions_values(self):
+        self.get_video_related_sessions()
+        values = []
+        for video_session in self.video_related_sessions:
+            by_time = video_session in self.caught_in_time
+            by_server = video_session in self.caught_in_server
+            by_payload = video_session in self.caught_in_threshold
+            values.append([video_session.srcIp, video_session.srcPort, video_session.dstIp, video_session.dstPort,
+                           by_payload, by_time, by_server])
+        return values
+
+
