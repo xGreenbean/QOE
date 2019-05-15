@@ -7,6 +7,7 @@ Class Session
     then we separate them to flows, upstreams and downstreams
 """
 
+
 class Session:
 
     def __init__(self, protocol,srcPort, dstPort, srcIp, dstIp, csvFile):
@@ -22,6 +23,7 @@ class Session:
         f_up, f_down = self.find_uploads_downloads()
         self.flow_up = Flow(f_up)
         self.flow_down = Flow(f_down)
+        self.connection_opening_time = self.all_packets['frame.time_epoch'].min()
 
     """
         The function get all the packet in the pcap file, filters the right ip's and then filter all the packets 
@@ -60,3 +62,6 @@ class Session:
         uploads = pd[pd['ip.src'] == self.srcIp]
         downloads = pd[pd['ip.src'] == self.dstIp]
         return uploads, downloads
+
+    def to_print(self):
+        return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]

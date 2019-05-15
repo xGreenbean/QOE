@@ -44,6 +44,9 @@ def extract_features(csv_file):
         else:
             extract_udp(all_sessions[i])
 
+
+def
+
 if __name__ == '__main__':
     csv_file = pd.read_csv("testw.csv")
     extract_features(csv_file)

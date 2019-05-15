@@ -1,0 +1,10 @@
+Records
+archive
+test.py
+Streamer/venv
+Streamer/.idea
+Streamer/__pycache__
+bash_to_csv_scripts
+archive
+/FeatureExtractor/__pycache__
+/FeatureExtractor/containers/__pycache__

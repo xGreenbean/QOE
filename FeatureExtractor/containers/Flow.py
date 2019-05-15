@@ -174,7 +174,6 @@ class Flow:
         else:
             feature_arr = np.zeros(9)
 
-
         return feature_arr
 
 
