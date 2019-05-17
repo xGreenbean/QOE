@@ -1,14 +1,21 @@
 from containers.Session import *
-from FeaturesCalculation import *
+from Features.FeaturesCalculation import *
 import pandas as pd
-
+from Features.Vector import Vector
+from Features.Sample import Sample
 
 def get_all_sessions(csv_file):
     all_sessions = []
     #mySession = Session("UDP", "42577.0", "443.0", "10.185.33.246", "172.217.22.106", csv_file)
+    #ip.addr==10.185.33.246 && udp.port==49664 && ip.addr==173.194.164.122 && udp.port==443
+    #mySession = Session("UDP", "49664.0", "443.0", "10.185.33.246", "173.194.164.122", csv_file)
     mySession = Session("TCP", "39600.0", "443.0", "10.185.33.246", "23.23.151.189", csv_file)
-    all_sessions.append(mySession)
-    return all_sessions
+
+    Sample.video_no_video_by_session(mySession, 0.1)
+
+
+    #all_sessions.append(mySession)
+    #return all_sessions
 
 
 def extract_tcp(session):
@@ -37,15 +44,14 @@ def extract_udp(session):
 
 
 def extract_features(csv_file):
-    all_sessions = get_all_sessions(csv_file)
+    get_all_sessions(csv_file)
+    all_sessions = []
     for i in range(len(all_sessions)):
         if all_sessions[i].protocol == "TCP":
             extract_tcp(all_sessions[i])
         else:
             extract_udp(all_sessions[i])
 
-
-def
 
 if __name__ == '__main__':
     csv_file = pd.read_csv("testw.csv")

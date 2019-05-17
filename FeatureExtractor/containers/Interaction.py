@@ -1,6 +1,6 @@
 import pandas as pd
 from containers.Session import *
-from Streamer import *
+from containers.PacketContainer import PacketContainer
 """
 Class Interaction
     defines interaction between client and the internet,
@@ -9,7 +9,7 @@ Class Interaction
 """
 
 
-class Interaction:
+class Interaction(PacketContainer):
 
     def __init__(self, pcap_df):
         self.clientIP = 0
@@ -50,3 +50,6 @@ class Interaction:
         for sess in self.sessions:
             values.append([sess.srcIp, sess.srcPort, sess.dstIp, sess.dstPort])
         return values
+
+    def getSample(self):
+        return self.pcap_df

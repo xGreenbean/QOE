@@ -1,5 +1,5 @@
 from containers.Flow import *
-
+from containers.PacketContainer import PacketContainer
 """
 Class Session
     define session by 5-tuple: Protocol, ip,port source and destination
@@ -8,7 +8,7 @@ Class Session
 """
 
 
-class Session:
+class Session(PacketContainer):
 
     def __init__(self, protocol,srcPort, dstPort, srcIp, dstIp, csvFile):
         self.srcPort = srcPort
@@ -62,6 +62,9 @@ class Session:
         uploads = pd[pd['ip.src'] == self.srcIp]
         downloads = pd[pd['ip.src'] == self.dstIp]
         return uploads, downloads
+
+    def getSample(self):
+        return self.all_packets
 
     def to_print(self):
         return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]

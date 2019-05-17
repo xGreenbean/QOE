@@ -1,5 +1,5 @@
 from Statistics.StreamerStatistics import *
-
+from containers.PacketContainer import PacketContainer
 """
 Class Streamer
     holds an interaction, build for functions 'get_video_related_sessions'
@@ -11,7 +11,7 @@ Class Streamer
 """
 
 
-class Streamer(StreamerStatistics):
+class Streamer(StreamerStatistics, PacketContainer):
     def __init__(self, interaction, delta_s, delta_t, threshold_p):
         super(Streamer, self).__init__()
         self.interaction = interaction
@@ -77,4 +77,5 @@ class Streamer(StreamerStatistics):
                            by_payload, by_time, by_server])
         return values
 
-
+    def getSample(self):
+        return self.video_related_sessions
