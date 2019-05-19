@@ -1,60 +1,46 @@
-from containers.Session import *
-from Features.FeaturesCalculation import *
 import pandas as pd
-from Features.Vector import Vector
+from containers.Interaction import Interaction
 from Features.Sample import Sample
-
-def get_all_sessions(csv_file):
-    all_sessions = []
-    #mySession = Session("UDP", "42577.0", "443.0", "10.185.33.246", "172.217.22.106", csv_file)
-    #ip.addr==10.185.33.246 && udp.port==49664 && ip.addr==173.194.164.122 && udp.port==443
-    #mySession = Session("UDP", "49664.0", "443.0", "10.185.33.246", "173.194.164.122", csv_file)
-    mySession = Session("TCP", "39600.0", "443.0", "10.185.33.246", "23.23.151.189", csv_file)
-
-    Sample.video_no_video_by_session(mySession, 0.1)
+from Generators.CsvGenerator import CsvGenerator
+from Generators.SniGenerator import SniGenerator
+from Configs import conf
 
 
-    #all_sessions.append(mySession)
-    #return all_sessions
+def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
+    interaction = Interaction(csv_df)
+    all_session = interaction.get_sessions()
+    tcp_data = []
+    headers = Sample.video_no_video_by_session_headers()
+    tcp_data.append(headers)
+    for session in all_session:
+        if session.protocol == "TCP":
+            sample = Sample.application_by_session(session, conf.sni_to_read, 0.1)
+            tcp_data.append(sample)
+
+    csv = CsvGenerator(path+device+"_"+ott + "_video_features_"+id_num+".csv", tcp_data)
+    csv.create_file()
+    print('Done '+device+" "+ott+" id "+ str(id_num))
 
 
-def extract_tcp(session):
-    Features = ["fSSL_session_id_len", "fSSL_num_extensions", "fSSL_num_compression_methods",
-    "SYN_tcp_scale", "SYN_MSS", "SYN_tcp_winsize", "fcipher_suites", "fSSLv", "size_histogram",
-    "fpeak_features", "bpeak_features", "packet_count", "min_packet_size", "max_packet_size",
-    "mean_packet_size", "sizevar", "std_fiat", "fpackets", "bpackets", "fbytes", "bbytes", "min_fiat",
-    "min_biat", "max_fiat", "max_biat", "std_biat", "mean_fiat", "mean_biat", "min_fpkt", "min_bpkt",
-    "max_fpkt", "max_bpkt", "std_fpkt", "std_bpkt", "mean_fpkt", "mean_bpkt", "mean_fttl", "num_keep_alive"]
-    feature_session = FeaturesCalculation(session)
-    for f in Features:
-        method = getattr(feature_session, f)
-        print(f + "         " + str(method()))
-
-def extract_udp(session):
-    Features = ["size_histogram",
-    "fpeak_features", "bpeak_features", "packet_count", "min_packet_size", "max_packet_size",
-    "mean_packet_size", "sizevar", "std_fiat", "fpackets", "bpackets", "fbytes", "bbytes", "min_fiat",
-    "min_biat", "max_fiat", "max_biat", "std_biat", "mean_fiat", "mean_biat", "min_fpkt", "min_bpkt",
-    "max_fpkt", "max_bpkt", "std_fpkt", "std_bpkt", "mean_fpkt", "mean_bpkt", "mean_fttl", "num_keep_alive"]
-    feature_session = FeaturesCalculation(session)
-    for f in Features:
-        method = getattr(feature_session, f)
-        print(f + "         " + str(method()))
+def export_features():
+    for device in conf.Devices:
+        for ott in conf.Otts:
+            for i in range(conf.numbers_of_id):
+                df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\" + device + "_" + ott + "\\Id_" + str(
+                    i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
+                build_csv_features_per_pcap(df, "C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott+"\\Id_"+str(
+                    i+1)+"\\", str(i + 1), ott, device)
 
 
-
-def extract_features(csv_file):
-    get_all_sessions(csv_file)
-    all_sessions = []
-    for i in range(len(all_sessions)):
-        if all_sessions[i].protocol == "TCP":
-            extract_tcp(all_sessions[i])
-        else:
-            extract_udp(all_sessions[i])
+def create_sni():
+    sni_gen = SniGenerator(conf.video_no_video_sni)
+    all_sni = sni_gen.get_all_sni()
+    dicts = sni_gen.sni_to_label(all_sni)
+    sni_gen.save_file("sni_video_other.txt", dicts)
 
 
 if __name__ == '__main__':
-    csv_file = pd.read_csv("testw.csv")
-    extract_features(csv_file)
+    export_features()
+#   create_sni()
 
 

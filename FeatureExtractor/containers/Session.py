@@ -10,16 +10,16 @@ Class Session
 
 class Session(PacketContainer):
 
-    def __init__(self, protocol,srcPort, dstPort, srcIp, dstIp, csvFile):
-        self.srcPort = srcPort
-        self.srcIp = srcIp
-        self.dstIp = dstIp
-        self.dstPort = dstPort
+    def __init__(self, protocol, src_port, dst_port, src_ip, dst_ip, csv_file):
+        self.srcPort = src_port
+        self.srcIp = src_ip
+        self.dstIp = dst_ip
+        self.dstPort = dst_port
         self.protocol = protocol
         if protocol == "TCP":
-            self.all_packets = self.get_all_tcps(csvFile)
+            self.all_packets = self.get_all_tcps(csv_file)
         elif protocol == "UDP":
-            self.all_packets = self.get_all_udps(csvFile)
+            self.all_packets = self.get_all_udps(csv_file)
         f_up, f_down = self.find_uploads_downloads()
         self.flow_up = Flow(f_up)
         self.flow_down = Flow(f_down)
@@ -65,6 +65,22 @@ class Session(PacketContainer):
 
     def getSample(self):
         return self.all_packets
+
+    """
+        Function return the sni for the session 
+    """
+#   csv files from dataset don't have gquic.tag.sni column, Return "None" for now since exporting tcp features only
+    def get_sni(self):
+        flow_up_df = self.flow_up.getSample()
+        if self.protocol == 'TCP':
+            sni_filter = "tls.handshake.extensions_server_name"
+        else:
+            sni_filter = "gquic.tag.sni"
+            return "None"
+        df = flow_up_df[flow_up_df[sni_filter].notnull()]
+        if len(df) == 0:
+            return "None"
+        return str(df[sni_filter].iloc[0])
 
     def to_print(self):
         return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]

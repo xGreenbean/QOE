@@ -6,6 +6,7 @@ class PacketContainer(object):
     def __init__(self, data_frame):
         self.df = data_frame
 
+
     def getSample(self):
         return self.data_frame
 

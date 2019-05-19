@@ -1,39 +1,40 @@
 from Features.Vector import Vector
+from Generators.CsvGenerator import CsvGenerator
+from Features.Label import Label
+from Configs import conf
 
 
 class Sample:
 
-    """app_vid - Feature lists to build the vector for video / novideo and application by session"""
-    app_vid_top_features = ["max_peak", "min_peak", "std_peak", "mean_peak", "max_silence_time", "min_silence_time",
-                            "mean_silence_time", "std_silence_time", "peaks_count"]
+    @staticmethod
+    def application_by_session(session, sni_file_name, interval):
+        sni = session.get_sni()
+        vector_session = Vector(session)
+        vector_flow_up = Vector(session.flow_up)
+        vector_flow_down = Vector(session.flow_down)
+        # -- Session
+        vec_session = vector_session.get_vector_feature(conf.app_vid_session_features)
+        # -- Flow up
+        vec_flow_up_top = vector_flow_up.get_vector_feature_by_interval(interval, conf.app_vid_top_features)
+        vec_flow_up = vector_flow_up.get_vector_feature(conf.app_vid_flow_up_features)
+        # -- Flow down
+        vec_flow_down_top = vector_flow_down.get_vector_feature_by_interval(interval, conf.app_vid_top_features)
+        vec_flow_down = vector_flow_down.get_vector_feature(conf.app_vid_flow_down_features)
 
-    app_vid_session_features = ["size_histogram", "packet_count", "min_packet_size", "max_packet_size",
-                                "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
-                                "min_time_delta", "mean_time_delta"]
-
-    app_vid_flow_up_features = ["upstream_cipher_suites", "upstream_ssl_v", "upstream_ssl_session_id_len",
-                                "upstream_ssl_num_extensions",
-                                "upstream_ssl_num_compression_methods", "size_histogram", "packet_count",
-                                "min_packet_size",
-                                "max_packet_size", "mean_packet_size", "std_packet_size", "size_var", "syn_tcp_scale",
-                                "syn_mss", "syn_tcp_win_size", "max_time_delta", "std_time_delta", "min_time_delta",
-                                "mean_time_delta", "upstream_mean_ttl",
-                                "upstream_num_keep_alive"]
-
-    app_vid_flow_down_features = ["size_histogram", "packet_count", "min_packet_size", "max_packet_size",
-                                  "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
-                                  "min_time_delta", "mean_time_delta"]
+        all_vector = CsvGenerator.combine_list([vec_session, vec_flow_up_top, vec_flow_up, vec_flow_down_top,
+                                                vec_flow_down])
+        label = Label.label_by_sni(sni_file_name, sni)
+        all_vector.append(Label.label_by_video(label))
+        return all_vector
 
     @staticmethod
-    def video_no_video_by_session(session, interval):
-        vector_session = Vector(session, "Session")
-        vector_flow_up = Vector(session.flow_up, "Flow_up")
-        vector_flow_down = Vector(session.flow_down, "Flow_down")
-        # -- Session
-        vector_session.get_vector_feature(Sample.app_vid_session_features)
-        # -- Flow up
-        vector_flow_up.get_vector_feature_by_interval(interval, Sample.app_vid_top_features)
-        vector_flow_up.get_vector_feature(Sample.app_vid_flow_up_features)
-        # -- Flow down
-        vector_flow_down.get_vector_feature_by_interval(interval, Sample.app_vid_top_features)
-        vector_flow_down.get_vector_feature(Sample.app_vid_flow_down_features)
+    def video_no_video_by_session_headers():
+        session_headers = CsvGenerator.custom_headers(conf.app_vid_session_features, "session")
+        flow_up_top_headers = CsvGenerator.custom_headers(conf.app_vid_top_features, "flow_up")
+        flow_up_headers = CsvGenerator.custom_headers(conf.app_vid_flow_up_features, "flow_up")
+        flow_down_top_headers = CsvGenerator.custom_headers(conf.app_vid_top_features, "flow_down")
+        flow_down_headers = CsvGenerator.custom_headers(conf.app_vid_flow_down_features, "flow_down")
+        headers = CsvGenerator.combine_list([session_headers, flow_up_top_headers, flow_up_headers,
+                                             flow_down_top_headers, flow_down_headers])
+        headers.append("Label")
+        return headers

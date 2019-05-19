@@ -4,9 +4,9 @@ from Features.TopFeatures import TopFeatures
 
 class Vector:
 
-    def __init__(self, pc, name):
+    def __init__(self, pc):
         self.pc = pc
-        self.name = name
+
     def get_vector_by_request_response(self, bin_size):
         pass
 
@@ -16,12 +16,16 @@ class Vector:
     def get_vector_feature(self, fc_l):
         df = self.pc.getSample()
         fc = FeaturesCalculation(df)
+        results = []
         for feature in fc_l:
             method = getattr(fc, feature)
-            print(self.name + "_" +feature + "         " + str(method()))
+            results.append(str(method()))
+        return results
 
     def get_vector_feature_by_interval(self, interval, ft_l):
         ft = TopFeatures(self.pc.split(interval))
+        results = []
         for feature in ft_l:
             method = getattr(ft, feature)
-            print(feature + "         " + str(method()))
+            results.append(method())
+        return results
