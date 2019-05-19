@@ -17,7 +17,7 @@ def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
             sample = Sample.application_by_session(session, conf.sni_to_read, 0.1)
             tcp_data.append(sample)
 
-    csv = CsvGenerator(path+device+"_"+ott + "_video_features_"+id_num+".csv", tcp_data)
+    csv = CsvGenerator(path+device+"_"+ott + "_"+conf.feature_type+"_features_"+id_num+".csv", tcp_data)
     csv.create_file()
     print('Done '+device+" "+ott+" id "+ str(id_num))
 

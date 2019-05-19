@@ -1,5 +1,6 @@
 import pandas as pd
 from containers.Interaction import Interaction
+from Configs import conf
 
 
 class SniGenerator:
@@ -9,13 +10,10 @@ class SniGenerator:
 
     @staticmethod
     def get_all_sni():
-        Otts = ["YouTube", "Netflix", "FaceBook"]
-        Devices = ["onePlus6","iphone7"]
-        numbers_of_id = 5
         all_sni_list = []
-        for device in Devices:
-            for ott in Otts:
-                for i in range(numbers_of_id):
+        for device in conf.Devices:
+            for ott in conf.Otts:
+                for i in range(conf.numbers_of_id):
                     df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott + "\\Id_" + str(
                         i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
                     sni_df = SniGenerator.sni_in_df(df)
