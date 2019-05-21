@@ -2,8 +2,8 @@ from Breaker import *
 from containers.Interaction import *
 import os
 
-pcap_csv_path = '~/Desktop/QOE/test_source_filestest_breaker_1.csv'
-pcap_csv_label_path = '~/Desktop/QOE/test_source_filesbreaker_test_labels_1.csv'
+pcap_csv_path = '~/Desktop/QOE/test_source_files/test_breaker_3.csv'
+pcap_csv_label_path = '~/Desktop/QOE/test_source_files/test_breaker_labels_3.csv'
 interaction = Interaction(pd.read_csv(pcap_csv_path))
 pd_labels = pd.read_csv(pcap_csv_label_path)
 
@@ -20,5 +20,5 @@ def test(pcap_csv_path, pcap_csv_label_path):
                 print('test failed at:', pd_labels['Info'][get_number - 1])
                 return False
     return True
-
+print (test(pcap_csv_path, pcap_csv_label_path))
 

@@ -8,21 +8,21 @@ class Breaker(object):
         self.delta_t = delta_t
 
     def sess_break(self):
-        requests_responses = []
+        requests_responses =[]
         request_start_time = 0
-        request_response = []
+        request_response = pd.DataFrame(columns=self.session.all_packets.columns)
         for index, row in self.session.all_packets.iterrows():
             if row['ip.src'] == self.session.srcIp and row['frame.len'] > self.threshold_t and\
                     (request_start_time == 0 or row['frame.time_epoch'] - request_start_time > self.delta_t):
                 if len(request_response) > 0:
-                    requests_responses.append(list(request_response))
-                request_response.clear()
+                    requests_responses.append(pd.DataFrame(request_response))
+                request_response = request_response.iloc[0:0]
                 request_start_time = row['frame.time_epoch']
+                request_response = pd.DataFrame(columns=self.session.all_packets.columns)
                 request_response.append(row)
             else:
                 if len(request_response) > 0:
                     request_response.append(row)
-
         if len(request_response) > 0:
             requests_responses.append(pd.DataFrame(request_response,self.session.all_packets.columns))
         return requests_responses
