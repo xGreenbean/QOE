@@ -4,6 +4,8 @@ from Features.Sample import Sample
 from Generators.CsvGenerator import CsvGenerator
 from Generators.SniGenerator import SniGenerator
 from Configs import conf
+import ast
+
 
 
 def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
@@ -35,12 +37,16 @@ def export_features():
 def create_sni():
     sni_gen = SniGenerator(conf.video_no_video_sni)
     all_sni = sni_gen.get_all_sni()
-    dicts = sni_gen.sni_to_label(all_sni)
-    sni_gen.save_file("sni_video_other.txt", dicts)
+    dict2s = sni_gen.sni_to_label(all_sni)
+    with open(conf.sni_to_read, 'r') as fp:
+        file_cont = fp.read()
+        dicts = ast.literal_eval(file_cont)
+    z = {**dicts, **dict2s}
+    sni_gen.save_file("sni_video_other.txt", z)
 
 
 if __name__ == '__main__':
     export_features()
-#   create_sni()
+    #create_sni()
 
 

@@ -24,7 +24,7 @@ sni_to_read = "sni_video_other.txt"
 
 # ----------------------------------- Parameters for  Data factory iterators ---------------------------------------
 
-Otts = ["YouTube", "Netflix", "FaceBook"]
+Otts = ["YouTube", "Netflix", "FaceBook", "download"]
 Devices = ["onePlus6", "iphone7"]
 numbers_of_id = 5
 

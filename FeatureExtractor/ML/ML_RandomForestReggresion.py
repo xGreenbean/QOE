@@ -17,6 +17,7 @@ def run_rfr(test_size, num_trees, rs_test_train, rs_regressor):
 
     #   only for video/no video, for app remove
     if conf.feature_type == "video":
+        print("video")
         features = features.replace({"Label": {0: 2, 1: 3}})
     # One-hot encode the data using pandas get_dummies
     features = features.sample(frac=1)
