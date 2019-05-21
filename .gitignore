@@ -9,4 +9,5 @@ archive
 /FeatureExtractor/__pycache__
 /FeatureExtractor/containers/__pycache__
 /FeatureExtractor/.idea
-
+FeatureExtractor/containers/__pycache__
+FeatureExtractor/__pycache__/
