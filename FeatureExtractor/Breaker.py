@@ -1,4 +1,3 @@
-
 from containers.Session import *
 import pandas as pd
 
@@ -55,3 +54,4 @@ class Breaker(object):
                 result = pd.concat(frames)
                 request_response_list.append(result)
         return request_response_list
+
