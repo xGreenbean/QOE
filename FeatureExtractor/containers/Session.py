@@ -1,5 +1,9 @@
 from containers.Flow import *
+<<<<<<< HEAD
 from containers.PacketContainer import PacketContainer
+=======
+
+>>>>>>> 62529f38d293bd5e4c20e28ed0cb457625c63b74
 """
 Class Session
     define session by 5-tuple: Protocol, ip,port source and destination
@@ -8,6 +12,7 @@ Class Session
 """
 
 
+<<<<<<< HEAD
 class Session(PacketContainer):
 
     def __init__(self, protocol, src_port, dst_port, src_ip, dst_ip, csv_file):
@@ -20,6 +25,20 @@ class Session(PacketContainer):
             self.all_packets = self.get_all_tcps(csv_file)
         elif protocol == "UDP":
             self.all_packets = self.get_all_udps(csv_file)
+=======
+class Session:
+
+    def __init__(self, protocol,srcPort, dstPort, srcIp, dstIp, csvFile):
+        self.srcPort = srcPort
+        self.srcIp = srcIp
+        self.dstIp = dstIp
+        self.dstPort = dstPort
+        self.protocol = protocol
+        if protocol == "TCP":
+            self.all_packets = self.get_all_tcps(csvFile)
+        elif protocol == "UDP":
+            self.all_packets = self.get_all_udps(csvFile)
+>>>>>>> 62529f38d293bd5e4c20e28ed0cb457625c63b74
         f_up, f_down = self.find_uploads_downloads()
         self.flow_up = Flow(f_up)
         self.flow_down = Flow(f_down)
@@ -63,6 +82,7 @@ class Session(PacketContainer):
         downloads = pd[pd['ip.src'] == self.dstIp]
         return uploads, downloads
 
+<<<<<<< HEAD
     def getSample(self):
         return self.all_packets
 
@@ -82,5 +102,7 @@ class Session(PacketContainer):
             return "None"
         return str(df[sni_filter].iloc[0])
 
+=======
+>>>>>>> 62529f38d293bd5e4c20e28ed0cb457625c63b74
     def to_print(self):
         return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]
