@@ -5,7 +5,7 @@ from Configs import conf
 from Breaker import Breaker
 
 
-class Sample:
+class SampleFactory:
 
     @staticmethod
     def application_by_session(session, sni_file_name, interval):

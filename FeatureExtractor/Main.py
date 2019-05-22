@@ -1,6 +1,6 @@
 import pandas as pd
 from containers.Interaction import Interaction
-from Features.Sample import Sample
+from Features.SampleFactory import SampleFactory
 from Generators.CsvGenerator import CsvGenerator
 from Generators.SniGenerator import SniGenerator
 from Configs import conf
@@ -11,11 +11,11 @@ def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
     interaction = Interaction(csv_df)
     all_session = interaction.get_sessions()
     tcp_data = []
-    headers = Sample.video_session_request_response_headers()
+    headers = SampleFactory.video_session_request_response_headers()
     tcp_data.append(headers)
     for session in all_session:
         if session.protocol == "TCP":
-            sample = Sample.video_by_request_response_session(session, conf.sni_to_read, 0.05, 250)
+            sample = SampleFactory.video_by_request_response_session(session, conf.sni_to_read, 0.05, 250)
             tcp_data.append(sample)
 
     csv = CsvGenerator(path+device+"_"+ott + "_"+conf.feature_type+"request_response_features_"+id_num+".csv", tcp_data)
