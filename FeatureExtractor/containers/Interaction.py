@@ -8,6 +8,7 @@ Class Interaction
     that we have recorded.
 """
 
+
 class Interaction(PacketContainer):
 
     def __init__(self, pcap_df):
