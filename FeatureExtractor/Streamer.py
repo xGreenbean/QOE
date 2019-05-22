@@ -1,13 +1,5 @@
 from Statistics.StreamerStatistics import *
-<<<<<<< HEAD
-<<<<<<< HEAD
 from containers.PacketContainer import PacketContainer
-=======
-
->>>>>>> 62529f38d293bd5e4c20e28ed0cb457625c63b74
-=======
-from containers.PacketContainer import PacketContainer
->>>>>>> develop-features
 """
 Class Streamer
     holds an interaction, build for functions 'get_video_related_sessions'
@@ -19,15 +11,7 @@ Class Streamer
 """
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 class Streamer(StreamerStatistics, PacketContainer):
-=======
-class Streamer(StreamerStatistics):
->>>>>>> 62529f38d293bd5e4c20e28ed0cb457625c63b74
-=======
-class Streamer(StreamerStatistics, PacketContainer):
->>>>>>> develop-features
     def __init__(self, interaction, delta_s, delta_t, threshold_p):
         super(Streamer, self).__init__()
         self.interaction = interaction

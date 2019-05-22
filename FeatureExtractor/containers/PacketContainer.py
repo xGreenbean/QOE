@@ -4,6 +4,7 @@ import pandas as pd
  Class PacketContainer holds some data frame df.
 """
 
+
 class PacketContainer(object):
 
     def __init__(self, data_frame):
