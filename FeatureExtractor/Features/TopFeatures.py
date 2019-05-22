@@ -1,6 +1,7 @@
 from Features.MiddleFeatures import MiddleFeatures
 import numpy as np
 
+
 class TopFeatures:
 
     def __init__(self, pc_array):

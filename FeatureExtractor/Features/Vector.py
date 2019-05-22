@@ -7,8 +7,23 @@ class Vector:
     def __init__(self, pc):
         self.pc = pc
 
-    def get_vector_by_request_response(self, bin_size):
-        pass
+    def get_vector_by_request_response(self, ft_l):
+        array_df = self.pc.getSample()
+        fc = TopFeatures(array_df)
+        results = []
+        for feature in ft_l:
+            method = getattr(fc, feature)
+            results.append(str(method()))
+        return results
+
+    def get_vector_by_request_response_bins(self, bin_size, ft_l):
+        array_df = self.pc.split(bin_size)
+        fc = TopFeatures(array_df)
+        results = []
+        for feature in ft_l:
+            method = getattr(fc, feature)
+            results.append(str(method()))
+        return results
 
     def get_vector_by_streamer(self):
         pass

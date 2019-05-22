@@ -7,31 +7,33 @@ from Configs import conf
 import ast
 
 
-
 def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
     interaction = Interaction(csv_df)
     all_session = interaction.get_sessions()
     tcp_data = []
-    headers = Sample.video_no_video_by_session_headers()
+    headers = Sample.video_session_request_response_headers()
     tcp_data.append(headers)
     for session in all_session:
         if session.protocol == "TCP":
-            sample = Sample.application_by_session(session, conf.sni_to_read, 0.1)
+            sample = Sample.video_by_request_response_session(session, conf.sni_to_read, 0.05, 250)
             tcp_data.append(sample)
 
-    csv = CsvGenerator(path+device+"_"+ott + "_"+conf.feature_type+"_features_"+id_num+".csv", tcp_data)
+    csv = CsvGenerator(path+device+"_"+ott + "_"+conf.feature_type+"request_response_features_"+id_num+".csv", tcp_data)
     csv.create_file()
-    print('Done '+device+" "+ott+" id "+ str(id_num))
+    print('Done '+device+" "+ott+" id "+str(id_num))
 
 
 def export_features():
     for device in conf.Devices:
         for ott in conf.Otts:
-            for i in range(conf.numbers_of_id):
-                df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\" + device + "_" + ott + "\\Id_" + str(
-                    i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
-                build_csv_features_per_pcap(df, "C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott+"\\Id_"+str(
-                    i+1)+"\\", str(i + 1), ott, device)
+            if device == "onePlus6" and ott == "download":
+                pass
+            else:
+                for i in range(conf.numbers_of_id):
+                    df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\" + device + "_" + ott + "\\Id_" + str(
+                        i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
+                    build_csv_features_per_pcap(df, "C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott+"\\Id_"+str(
+                        i+1)+"\\", str(i + 1), ott, device)
 
 
 def create_sni():
