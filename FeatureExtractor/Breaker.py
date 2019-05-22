@@ -1,28 +1,39 @@
 from containers.Session import *
 import pandas as pd
 
+
 class Breaker(object):
     def __init__(self, session, delta_t, threshold_t):
+        """pandas data frame, represents a session"""
         self.session = session
+        """threshold_t, represents GET minimum request size"""
         self.threshold_t = threshold_t
+        """delta_t, minimum time between requests"""
         self.delta_t = delta_t
 
+    """returns pandas dataframe[], with each element being a request and its response"""
     def sess_break(self):
-        requests_responses =[]
+        requests_responses = []
         request_start_time = 0
-        request_response = pd.DataFrame(columns=self.session.all_packets.columns)
+        request_response = []
         for index, row in self.session.all_packets.iterrows():
+
+            """check for clients packets requests"""
             if row['ip.src'] == self.session.srcIp and row['frame.len'] > self.threshold_t and\
                     (request_start_time == 0 or row['frame.time_epoch'] - request_start_time > self.delta_t):
-                if len(request_response) > 0:
-                    requests_responses.append(pd.DataFrame(request_response))
-                request_response = request_response.iloc[0:0]
+
+                if request_response:
+                    requests_responses.append(pd.DataFrame(self.session.all_packets.loc[request_response]))
+                    request_response.clear()
+
                 request_start_time = row['frame.time_epoch']
-                request_response = pd.DataFrame(columns=self.session.all_packets.columns)
-                request_response.append(row)
+                request_response.append(index)
+
             else:
-                if len(request_response) > 0:
-                    request_response.append(row)
-        if len(request_response) > 0:
-            requests_responses.append(pd.DataFrame(request_response,self.session.all_packets.columns))
+                if request_response:
+                    request_response.append(index)
+
+        if request_response:
+            requests_responses.append(pd.DataFrame(self.session.all_packets.loc[request_response]))
+
         return requests_responses
