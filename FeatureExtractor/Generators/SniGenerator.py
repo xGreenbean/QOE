@@ -1,21 +1,23 @@
 import pandas as pd
 from containers.Interaction import Interaction
 from Configs import conf
+global data_set_path
+import os
+
+data_set_path = '/home/ehud/Desktop/dataset/'
 
 
 class SniGenerator:
-
     def __init__(self, labels):
         self.labels = labels
 
     @staticmethod
     def get_all_sni():
         all_sni_list = []
-        for device in conf.Devices:
-            for ott in conf.Otts:
-                for i in range(conf.numbers_of_id):
-                    df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott + "\\Id_" + str(
-                        i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
+        for dirName, subdirList, fileList in os.walk(data_set_path):
+            for fname in fileList:
+                if fname.endswith('.csv') and 'features' not in fname:
+                    df = pd.read_csv(os.path.join(dirName, fname))
                     sni_df = SniGenerator.sni_in_df(df)
                     all_sni_list = all_sni_list + sni_df
         return all_sni_list
