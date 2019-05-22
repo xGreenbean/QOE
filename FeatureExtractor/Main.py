@@ -26,11 +26,14 @@ def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
 def export_features():
     for device in conf.Devices:
         for ott in conf.Otts:
-            for i in range(conf.numbers_of_id):
-                df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\" + device + "_" + ott + "\\Id_" + str(
-                    i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
-                build_csv_features_per_pcap(df, "C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott+"\\Id_"+str(
-                    i+1)+"\\", str(i + 1), ott, device)
+            if device == "onePlus6" and ott == "download":
+                pass
+            else:
+                for i in range(conf.numbers_of_id):
+                    df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\" + device + "_" + ott + "\\Id_" + str(
+                        i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
+                    build_csv_features_per_pcap(df, "C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott+"\\Id_"+str(
+                        i+1)+"\\", str(i + 1), ott, device)
 
 
 def create_sni():

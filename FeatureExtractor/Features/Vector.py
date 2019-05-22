@@ -24,7 +24,6 @@ class Vector:
             method = getattr(fc, feature)
             results.append(str(method()))
         return results
-    
 
     def get_vector_by_streamer(self):
         pass
