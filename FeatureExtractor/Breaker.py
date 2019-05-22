@@ -12,7 +12,6 @@ class Breaker(object):
         self.delta_t = delta_t
 
     """returns pandas dataframe[], with each element being a request and its response"""
-
     def sess_break(self):
         requests_responses = []
         request_start_time = 0
@@ -20,7 +19,7 @@ class Breaker(object):
         for index, row in self.session.all_packets.iterrows():
 
             """check for clients packets requests"""
-            if row['ip.src'] == self.session.srcIp and row['frame.len'] > self.threshold_t and \
+            if row['ip.src'] == self.session.srcIp and row['frame.len'] > self.threshold_t and\
                     (request_start_time == 0 or row['frame.time_epoch'] - request_start_time > self.delta_t):
 
                 if request_response:
@@ -38,7 +37,7 @@ class Breaker(object):
             requests_responses.append(pd.DataFrame(self.session.all_packets.loc[request_response]))
 
         return requests_responses
-    
+
     def getSample(self):
         return self.sess_break()
 
