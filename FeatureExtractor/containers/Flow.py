@@ -1,19 +1,25 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from containers.PacketContainer import PacketContainer
 
 
 class Flow(PacketContainer):
 =======
+=======
+from containers.PacketContainer import PacketContainer
+>>>>>>> develop-features
 
-import numpy as np
 
-class Flow:
-
+<<<<<<< HEAD
 >>>>>>> 62529f38d293bd5e4c20e28ed0cb457625c63b74
+=======
+class Flow(PacketContainer):
+>>>>>>> develop-features
 
     def __init__(self, flow_packets):
         self.df = flow_packets
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     def getSample(self):
         return self.df
@@ -203,3 +209,8 @@ class Flow:
 
 
 >>>>>>> 62529f38d293bd5e4c20e28ed0cb457625c63b74
+=======
+    def getSample(self):
+        return self.df
+
+>>>>>>> develop-features

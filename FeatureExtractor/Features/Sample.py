@@ -5,6 +5,7 @@ from Configs import conf
 from Breaker import Breaker
 
 
+
 class Sample:
 
     @staticmethod
@@ -61,6 +62,7 @@ class Sample:
         vec_response_request = vector_request_response.get_vector_by_request_response(conf.app_vid_top_features)
         all_vector = CsvGenerator.combine_list([vec_session, vec_response_request])
         label = Label.label_by_sni(sni_file_name, sni)
+
         all_vector.append(Label.label_by_video(label))
         return all_vector
 
@@ -95,3 +97,4 @@ class Sample:
         headers = CsvGenerator.combine_list([session_headers, request_response_headers])
         headers.append("Label")
         return headers
+

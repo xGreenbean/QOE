@@ -23,6 +23,7 @@ class MiddleFeatures:
         peak_sizes = MiddleFeatures.df_array_to_packet_sizes(df_list)
         return np.array(peak_sizes)
 
+
     def peaks_length(self):
         df_list = self.peak_structure()
         peaks_length = MiddleFeatures.df_array_durations(df_list)
@@ -76,7 +77,7 @@ class MiddleFeatures:
             if len(interval) != 0:
                 frames.append(interval)
             elif len(frames) != 0:
-                frames_list.append(pd.concat(frames))
+                frames_list .append(pd.concat(frames))
                 frames = []
         return frames_list
 
