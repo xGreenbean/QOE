@@ -4,7 +4,7 @@ from Configs import conf
 global data_set_path
 import os
 
-data_set_path = '/home/ehud/Desktop/dataset/'
+data_set_path = conf.dataset_path
 
 
 class SniGenerator:

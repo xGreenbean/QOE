@@ -17,7 +17,7 @@ class FeaturesCalculation:
         self.df = pc
         df = self.df
         """ Get client hello """
-        self.client_hello_pkt = df[df['tls.handshake.extensions_server_name'].notnull()]
+        self.client_hello_pkt = df[df['ssl.handshake.extensions_server_name'].notnull()]
         """ Get SYN packet """
         self.syn_pkt = df[(df['tcp.flags.syn'] == 1) & (df['tcp.flags.ack'] == 0)]
 

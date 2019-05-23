@@ -20,6 +20,8 @@ video_no_video_sni = {
 
 sni_to_read = "sni_video_other.txt"
 
+"""path to dataset"""
+dataset_path = '/home/cyberlab/Desktop/dataset/'
 # ------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------- Parameters for  Data factory iterators ---------------------------------------

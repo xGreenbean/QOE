@@ -1,6 +1,6 @@
 from Features.Vector import Vector
 from Generators.CsvGenerator import CsvGenerator
-from Features.Label import Label
+from Features.LabelFactory import Label
 from Configs import conf
 from Breaker import Breaker
 
