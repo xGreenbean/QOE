@@ -28,8 +28,20 @@ class MiddleFeatures:
         peak_differences = MiddleFeatures.deltas_between_frames(df_list)
         return np.array(peak_differences)
 
-    def get_response_request(self):
-        pass
+    def response_request_delta(self):
+        df_list = self.pc
+        peak_differences = MiddleFeatures.deltas_between_frames(df_list)
+        return np.array(peak_differences)
+
+    def response_request_length(self):
+        df_list = self.pc
+        peaks_length = MiddleFeatures.df_array_durations(df_list)
+        return np.array(peaks_length)
+
+    def response_request_sizes(self):
+        df_list = self.pc
+        peak_sizes = MiddleFeatures.df_array_to_packet_sizes(df_list)
+        return np.array(peak_sizes)
 
     @staticmethod
     def df_array_to_packet_sizes(pc_list):

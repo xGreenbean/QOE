@@ -18,12 +18,15 @@ class Vector:
 
     def get_vector_by_request_response_bins(self, bin_size, ft_l):
         array_df = self.pc.split(bin_size)
-        fc = TopFeatures(array_df)
-        results = []
-        for feature in ft_l:
-            method = getattr(fc, feature)
-            results.append(str(method()))
-        return results
+        all_results = []
+        for bin_df in array_df:
+            fc = TopFeatures(bin_df)
+            bin_result = []
+            for feature in ft_l:
+                method = getattr(fc, feature)
+                bin_result.append(str(method()))
+            all_results.append(bin_result)
+        return all_results
 
     def get_vector_by_streamer(self):
         pass

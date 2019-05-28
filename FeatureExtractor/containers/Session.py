@@ -76,7 +76,6 @@ class Session(PacketContainer):
             sni_filter = "tls.handshake.extensions_server_name"
         else:
             sni_filter = "gquic.tag.sni"
-            return "None"
         df = flow_up_df[flow_up_df[sni_filter].notnull()]
         if len(df) == 0:
             return "None"
