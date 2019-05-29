@@ -4,13 +4,23 @@ from Configs import conf
 global data_set_path
 import os
 
+<<<<<<< HEAD
 data_set_path = conf.dataset_path
+=======
+"""
+Class Create an sni to label file based on labels the class gets
+The file is in a dictionary format, Each SNI tells what he means by the label.
+"""
+>>>>>>> b3af6c38c2b8482d9d549daee9686f81d496ee34
 
 
 class SniGenerator:
     def __init__(self, labels):
         self.labels = labels
 
+    """
+        Function return all sni's we have in the dataset
+    """
     @staticmethod
     def get_all_sni():
         all_sni_list = []
@@ -22,6 +32,9 @@ class SniGenerator:
                     all_sni_list = all_sni_list + sni_df
         return all_sni_list
 
+    """
+    Function gets a data frame df and extract from it all the sni's
+    """
     @staticmethod
     def sni_in_df(df):
         interaction = Interaction(df)

@@ -1,5 +1,10 @@
 import csv
 
+"""
+    Class CsvGenartor gets path and csv_data in format of a list and creates csv file containing that data.
+    The class also holds function to manipulate csv data and make it ready to export.
+"""
+
 
 class CsvGenerator:
 
@@ -7,12 +12,15 @@ class CsvGenerator:
         self.path = path
         self.csv_data = csv_data
 
+    """Function saves new file containing the data from csv_data in the path we get in the init function"""
     def create_file(self):
         with open(self.path, 'w', newline='') as csvFile:
             writer = csv.writer(csvFile)
             writer.writerows(self.csv_data)
         csvFile.close()
 
+    """Static function custom_headers gets a list of names(the headers) and a key word to make it uniq expression for 
+    headers in the csv file, Function return each name from list_headers with the prefix word_custom"""
     @staticmethod
     def custom_headers(list_headers, word_custom):
         custom_list = []
@@ -20,6 +28,8 @@ class CsvGenerator:
             custom_list.append(word_custom + "_" + string)
         return custom_list
 
+    """Static function custom_headers gets a array which each item is a list and simply combine them into one array with 
+     the same order."""
     @staticmethod
     def combine_list(array_of_lists):
         combined_list = []

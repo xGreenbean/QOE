@@ -4,7 +4,6 @@ from Features.SampleFactory import SampleFactory
 from Generators.CsvGenerator import CsvGenerator
 from Generators.SniGenerator import SniGenerator
 from Configs import conf
-import ast
 
 
 def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
@@ -14,10 +13,9 @@ def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
     headers = SampleFactory.video_session_request_response_headers()
     tcp_data.append(headers)
     for session in all_session:
-        if session.protocol == "TCP":
-            sample = SampleFactory.video_by_request_response_session(session, conf.sni_to_read, 0.05, 250)
-            tcp_data.append(sample)
-
+        sample = SampleFactory.video_by_request_response_session(session, conf.sni_to_read, 5, 0.05, 250)
+        for vector in sample:
+            tcp_data.append(vector)
     csv = CsvGenerator(path+device+"_"+ott + "_"+conf.feature_type+"request_response_features_"+id_num+".csv", tcp_data)
     csv.create_file()
     print('Done '+device+" "+ott+" id "+str(id_num))
@@ -39,14 +37,11 @@ def export_features():
 def create_sni():
     sni_gen = SniGenerator(conf.video_no_video_sni)
     all_sni = sni_gen.get_all_sni()
-    dict2s = sni_gen.sni_to_label(all_sni)
-    with open(conf.sni_to_read, 'r') as fp:
-        file_cont = fp.read()
-        dicts = ast.literal_eval(file_cont)
-    z = {**dicts, **dict2s}
-    sni_gen.save_file("sni_video_other.txt", z)
+    dicts = sni_gen.sni_to_label(all_sni)
+    sni_gen.save_file("sni_video_other.txt", dicts)
 
 
 if __name__ == '__main__':
     export_features()
     #create_sni()
+

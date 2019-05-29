@@ -1,5 +1,9 @@
 from containers.PacketContainer import PacketContainer
 
+"""
+    Class Flow contains a data frames for up/down packets in a session
+"""
+
 
 class Flow(PacketContainer):
 

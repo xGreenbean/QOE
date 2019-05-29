@@ -56,4 +56,10 @@ app_vid_flow_up_features = ["upstream_cipher_suites", "upstream_ssl_v", "upstrea
 app_vid_flow_down_features = ["packet_count", "min_packet_size", "max_packet_size",
                               "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
                               "min_time_delta", "mean_time_delta"]
+
+video_non_video_response_request_top_features = ["max_response_request", "min_response_request", "std_response_request",
+                                                 "mean_response_request", "max_response_request",
+                                                 "min_response_request_delta_time", "max_response_request_delta_time",
+                                                 "std_response_request_delta_time", "mean_response_request_delta_time",
+                                                 "response_request_count"]
 # ------------------------------------------------------------------------------------------------------------------

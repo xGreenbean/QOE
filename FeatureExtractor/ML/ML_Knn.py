@@ -32,4 +32,4 @@ def run_knn(test_size, num_of_neighbors):
 
 
 if __name__ == '__main__':
-    run_knn(0.30, 1)
+    run_knn(0.3, 1)
