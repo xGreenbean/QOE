@@ -4,14 +4,11 @@ from Configs import conf
 global data_set_path
 import os
 
-<<<<<<< HEAD
 data_set_path = conf.dataset_path
-=======
 """
 Class Create an sni to label file based on labels the class gets
 The file is in a dictionary format, Each SNI tells what he means by the label.
 """
->>>>>>> b3af6c38c2b8482d9d549daee9686f81d496ee34
 
 
 class SniGenerator:

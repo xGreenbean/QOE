@@ -10,7 +10,11 @@ application_sni = {
 }
 
 video_no_video_sni = {
-    "video": ["netflix", "nflxvideo", "nflxso", "nflx", "facebook", "fbcdn", "googlevideo"]
+    "video": ["netflix", "nflxvideo", "nflxso", "nflx", "facebook", "fbcdn", "googlevideo", "instagram", "cdnistagram"]
+}
+video_videoLike_noVideo = {
+    "video": ["nflxvideo", "fbcdn", "googlevideo","cdnistagram"],
+    "video_like": ["netflix", "nflxso", "nflx", "facebook","instagram"]
 }
 
 """ 
