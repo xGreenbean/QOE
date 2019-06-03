@@ -25,7 +25,7 @@ class DataFactory:
     def clean_csv():
         for dirName, subdirList, fileList in os.walk(conf.dataset_path):
             for fname in fileList:
-                if fname.endswith('.csv') and not fname.find('SNI'):
+                if fname.endswith('.csv'):
                     os.remove(os.path.join(dirName, fname))
 
     """remvoves old 'sessions' directories from dataset"""
@@ -44,41 +44,76 @@ class DataFactory:
 
     """creates sni txt file"""
     @staticmethod
-    def make_sni(test_type):
+    def make_sni(test_type, file_name):
         if test_type == 'app':
             sni_gen = SniGenerator(conf.application_sni)
         if test_type == 'video':
             sni_gen = SniGenerator(conf.video_no_video_sni)
+        if test_type == 'video_like':
+            sni_gen = SniGenerator(conf.video_videoLike_noVideo)
         all_sni = sni_gen.get_all_sni()
         dict2s = sni_gen.sni_to_label(all_sni)
-        sni_gen.save_file("sni_video_other.txt", dict2s)
+        sni_gen.save_file(file_name, dict2s)
 
     @staticmethod
-    def export_features():
+    def export_features(feature_type):
         for dirName, subdirList, fileList in os.walk(conf.dataset_path):
             for fname in fileList:
                 if fname.endswith('.csv') and fname.startswith('raw'):
                     interaction = Interaction(pd.read_csv(os.path.join(dirName, fname)))
-                    all_session = interaction.get_sessions()
+                    all_sessions = interaction.get_sessions()
                     tcp_data = []
-                    headers = SampleFactory.video_session_request_response_headers()
+                    if feature_type == 'app_session':
+                        headers = SampleFactory.session_headers()
+                    elif feature_type == 'app_request_response':
+                        headers = SampleFactory.session_request_response_headers()
+                    elif feature_type == 'video_session':
+                        headers = SampleFactory.session_headers()
+                    elif feature_type == 'video_request_response':
+                        headers = SampleFactory.session_request_response_headers()
+                    elif feature_type == 'video_like_request_response':
+                        headers = SampleFactory.session_request_response_headers()
                     tcp_data.append(headers)
-                    for session in all_session:
-                        if session.protocol == "TCP":
-                            sample = SampleFactory.video_by_request_response_session(session, conf.sni_to_read, 0.05,
-                                                                                     250)
+                    for session in all_sessions:
+                        if feature_type == 'app_session':
+                            sample = SampleFactory.application_by_session(session, 0.1, dirName)
                             tcp_data.append(sample)
-                        if session.protocol == "UDP":
-                            sample = SampleFactory.video_by_request_response_session(session, conf.sni_to_read, 0.05,
-                                                                                     250)
-                    csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'features')), tcp_data)
+                        elif feature_type == 'app_request_response':
+                            sample = SampleFactory.application_by_request_response_session(session, 5, 0.05,
+                                                                                     250, dirName)
+                            for vector in sample:
+                                tcp_data.append(vector)
+                        elif feature_type == 'video_session':
+                            sample = SampleFactory.video_no_video_by_session(session, 50000,  0.1, dirName)
+                            tcp_data.append(sample)
+                        elif feature_type == 'video_request_response':
+                            sample = SampleFactory.video_by_request_response_session(session,50000, 5, 0.05,
+                                                                                     250, dirName)
+                            for vector in sample:
+                                tcp_data.append(vector)
+                        elif feature_type == 'video_like_request_response':
+                            sample = SampleFactory.video_video_like_by_request_response_session(session, 50000, 5, 0.05,
+                                                                                250, dirName)
+                            for vector in sample:
+                                tcp_data.append(vector)
+
+                    if feature_type == 'app_session':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_by_sessions_features')), tcp_data)
+                    elif feature_type == 'app_request_response':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_by_req_res_features')), tcp_data)
+                    elif feature_type == 'video_session':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'video_by_session_features')), tcp_data)
+                    elif feature_type == 'video_request_response':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'video_req_res_features')), tcp_data)
+                    elif feature_type == 'video_like_request_response':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'video_like_req_res_features')), tcp_data)
                     csv.create_file()
 
     @staticmethod
     def rename_csv():
         for dirName, subdirList, fileList in os.walk(conf.dataset_path):
             for fname in fileList:
-                if fname.endswith('.csv'):
+                if fname.endswith('.csv') and not fname.startswith('raw'):
                     os.rename(os.path.join(dirName, fname), os.path.join(dirName, 'raw_' + fname))
 
     @staticmethod

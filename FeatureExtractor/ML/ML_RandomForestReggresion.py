@@ -13,12 +13,14 @@ Need upgrade this in this section
 
 def run_rfr(test_size, num_trees, rs_test_train, rs_regressor):
     # Read in data and display first 5 rows
-    features = draw_features()
+    feature_type = 'video_like_req_res_features'
+    features = draw_features(feature_type)
+    print(len(features[features['Label'] == 1]))
+    print(len(features[features['Label'] == 2]))
+    print(len(features[features['Label'] == 3]))
 
     #   only for video/no video, for app remove
-    if conf.feature_type == "video":
-        print("video")
-        features = features.replace({"Label": {0: 2, 1: 3}})
+
     # One-hot encode the data using pandas get_dummies
     features = features.sample(frac=1)
     features = pd.get_dummies(features)

@@ -1,6 +1,6 @@
 from Features.Vector import Vector
 from Generators.CsvGenerator import CsvGenerator
-from Features.LabelFactory import Label
+from Features.LabelFactory import LabelFactory
 from Configs import conf
 from Breaker import Breaker
 
@@ -8,7 +8,7 @@ from Breaker import Breaker
 class SampleFactory:
 
     @staticmethod
-    def application_by_session(session, sni_file_name, interval):
+    def application_by_session(session, interval, dirName):
         sni = session.get_sni()
         vector_session = Vector(session)
         vector_flow_up = Vector(session.flow_up)
@@ -24,13 +24,17 @@ class SampleFactory:
 
         all_vector = CsvGenerator.combine_list([vec_session, vec_flow_up_top, vec_flow_up, vec_flow_down_top,
                                                 vec_flow_down])
-        label = Label.label_by_sni(sni_file_name, sni)
-        all_vector.append(Label.label_by_app(label))
+
+        label = LabelFactory.label_by_sni(conf.application_sni, sni)
+        if "netflix_download" in dirName:
+            label = "Unknown"
+        all_vector.append(LabelFactory.label_by_app(label))
         return all_vector
 
     @staticmethod
-    def video_no_video_by_session(session, sni_file_name, interval):
+    def video_no_video_by_session(session, video_treshold, interval, dirName):
         sni = session.get_sni()
+        session_size = session.get_session_size()
         vector_session = Vector(session)
         vector_flow_up = Vector(session.flow_up)
         vector_flow_down = Vector(session.flow_down)
@@ -45,35 +49,60 @@ class SampleFactory:
 
         all_vector = CsvGenerator.combine_list([vec_session, vec_flow_up_top, vec_flow_up, vec_flow_down_top,
                                                 vec_flow_down])
-        label = Label.label_by_sni(sni_file_name, sni)
-        all_vector.append(Label.label_by_video(label))
+        label = LabelFactory.label_by_sni(conf.video_no_video_sni, sni)
+        if "netflix_download" in dirName or session_size < video_treshold:
+            label = "Unknown"
+        all_vector.append(LabelFactory.label_by_video(label))
         return all_vector
 
     @staticmethod
-    def video_by_request_response_session(session, sni_file_name, bin_size, delta_t, treshold):
+    def video_by_request_response_session(session, video_treshold, bin_size, delta_t, treshold,dirName):
         sni = session.get_sni()
+        session_size = session.get_session_size()
         breaker = Breaker(session, delta_t, treshold)
         vector_request_response = Vector(breaker)
-        vec_responses_requests = vector_request_response.get_vector_by_request_response_bins(bin_size, conf.video_non_video_response_request_top_features)
-        label = Label.label_by_sni(sni_file_name, sni)
+        vec_responses_requests = vector_request_response.get_vector_by_request_response_bins(bin_size, conf.response_request_top_features)
+
+        label = LabelFactory.label_by_sni(conf.video_no_video_sni, sni)
+        if "netflix_download" in dirName or session_size < video_treshold:
+            label = "Unknown"
         for vector in vec_responses_requests:
-            vector.append(Label.label_by_video(label))
+            vector.append(LabelFactory.label_by_video(label))
         return vec_responses_requests
 
     @staticmethod
-    def app_by_request_response_session(session, sni_file_name, bin_size, delta_t, treshold):
+    def video_video_like_by_request_response_session(session, video_treshold, bin_size, delta_t, treshold, dirName):
+        sni = session.get_sni()
+        session_size = session.get_session_size()
+        breaker = Breaker(session, delta_t, treshold)
+        vector_request_response = Vector(breaker)
+        vec_responses_requests = vector_request_response.get_vector_by_request_response_bins(bin_size,
+                                                                                             conf.response_request_top_features)
+        label = LabelFactory.label_by_sni(conf.video_videoLike_noVideo, sni)
+        if label == "video" and session_size < video_treshold:
+            label = "video_like"
+        if "netflix_download" in dirName:
+            label = "Unknown"
+        for vector in vec_responses_requests:
+            vector.append(LabelFactory.label_by_video_video_like(label))
+        return vec_responses_requests
+
+    @staticmethod
+    def application_by_request_response_session(session, bin_size, delta_t, treshold, dirName):
         sni = session.get_sni()
         breaker = Breaker(session, delta_t, treshold)
         vector_request_response = Vector(breaker)
         vec_responses_requests = vector_request_response.get_vector_by_request_response_bins(bin_size,
-                                                                                             conf.app_vid_top_features)
-        label = Label.label_by_sni(sni_file_name, sni)
+                                                                                             conf.response_request_top_features)
+        label = LabelFactory.label_by_sni(conf.application_sni, sni)
+        if "netflix_download" in dirName:
+            label = "Unknown"
         for vector in vec_responses_requests:
-            vector.append(Label.label_by_app(label))
+            vector.append(LabelFactory.label_by_app(label))
         return vec_responses_requests
 
     @staticmethod
-    def video_no_video_by_session_headers():
+    def session_headers():
         session_headers = CsvGenerator.custom_headers(conf.app_vid_session_features, "session")
         flow_up_top_headers = CsvGenerator.custom_headers(conf.app_vid_top_features, "flow_up")
         flow_up_headers = CsvGenerator.custom_headers(conf.app_vid_flow_up_features, "flow_up")
@@ -85,19 +114,8 @@ class SampleFactory:
         return headers
 
     @staticmethod
-    def app_session_headers():
-        session_headers = CsvGenerator.custom_headers(conf.app_vid_session_features, "session")
-        flow_up_top_headers = CsvGenerator.custom_headers(conf.app_vid_top_features, "flow_up")
-        flow_up_headers = CsvGenerator.custom_headers(conf.app_vid_flow_up_features, "flow_up")
-        flow_down_top_headers = CsvGenerator.custom_headers(conf.app_vid_top_features, "flow_down")
-        flow_down_headers = CsvGenerator.custom_headers(conf.app_vid_flow_down_features, "flow_down")
-        headers = CsvGenerator.combine_list([session_headers, flow_up_top_headers, flow_up_headers,
-                                             flow_down_top_headers, flow_down_headers])
-        headers.append("Label")
-        return headers
-
-    @staticmethod
-    def video_session_request_response_headers():
-        request_response_headers = CsvGenerator.custom_headers(conf.app_vid_top_features, "rr")
+    def session_request_response_headers():
+        request_response_headers = CsvGenerator.custom_headers(conf.response_request_top_features, "rr")
         request_response_headers.append("Label")
         return request_response_headers
+

@@ -14,19 +14,17 @@ class MiddleFeatures:
         self.pc = pc
 
     def peaks_size(self):
-       # df_list = self.peak_structure()
-        df_list = self.pc
+        df_list = self.peak_structure()
         peak_sizes = MiddleFeatures.df_array_to_packet_sizes(df_list)
         return np.array(peak_sizes)
-
+    
     def peaks_length(self):
         df_list = self.peak_structure()
         peaks_length = MiddleFeatures.df_array_durations(df_list)
         return np.array(peaks_length)
 
     def silences_deltas(self):
-        #df_list = self.peak_structure()
-        df_list = self.pc
+        df_list = self.peak_structure()
         peak_differences = MiddleFeatures.deltas_between_frames(df_list)
         return np.array(peak_differences)
 

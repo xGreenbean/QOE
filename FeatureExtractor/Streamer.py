@@ -46,6 +46,8 @@ class Streamer(PacketContainer):
                     if payloads >= self.threshold_p:
                         if sess not in self.video_related_sessions:
                             self.video_related_sessions.append(sess)
+                            self.add_server_related_sessions(sess)
+                            self.add_time_related_sessions(sess)
                     payloads = 0
         return self.video_related_sessions
 

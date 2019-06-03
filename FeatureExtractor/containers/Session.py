@@ -1,6 +1,6 @@
 from containers.Flow import *
 from containers.PacketContainer import PacketContainer
-
+from Features.FeaturesCalculation import FeaturesCalculation
 """
 Class Session
     define session by 5-tuple: Protocol, ip,port source and destination
@@ -66,6 +66,10 @@ class Session(PacketContainer):
 
     def getSample(self):
         return self.all_packets
+
+    def get_session_size(self):
+        fc = FeaturesCalculation(self.all_packets)
+        return fc.packets_size()
 
     """
         Function return the sni for the session 

@@ -4,17 +4,20 @@ SNI dictionaries in order to decide which labels to give either to app features 
  "Other" as thresh for unrecognized sessions)
 """
 application_sni = {
-    "Netflix": ["netflix", "nflxvideo", "nflxso", "nflx", ],
-    "FaceBook": ["facebook", "fbcdn"],
-    "YouTube": ["googlevideo", "youtube", "Youtube", "YouTube", "ads", "yt"]
+    "Netflix": ["nflxvideo"],
+    "FaceBook": ["fbcdn", "graph"],
+    "YouTube": ["googlevideo"],
+    "Instagram": ["cdnistagram"],
+    "OtherOTT": []
 }
 
 video_no_video_sni = {
-    "video": ["netflix", "nflxvideo", "nflxso", "nflx", "facebook", "fbcdn", "googlevideo", "instagram", "cdnistagram"]
+    "video": ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram"]
 }
+
 video_videoLike_noVideo = {
     "video": ["nflxvideo", "fbcdn", "googlevideo","cdnistagram"],
-    "video_like": ["netflix", "nflxso", "nflx", "facebook","instagram"]
+    "video_like": []
 }
 
 """ 
@@ -61,9 +64,9 @@ app_vid_flow_down_features = ["packet_count", "min_packet_size", "max_packet_siz
                               "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
                               "min_time_delta", "mean_time_delta"]
 
-video_non_video_response_request_top_features = ["max_response_request", "min_response_request", "std_response_request",
+response_request_top_features = ["max_response_request", "min_response_request", "std_response_request",
                                                  "mean_response_request", "max_response_request",
                                                  "min_response_request_delta_time", "max_response_request_delta_time",
                                                  "std_response_request_delta_time", "mean_response_request_delta_time",
-                                                 "response_request_count"]
+                                                 "request_response_count"]
 # ------------------------------------------------------------------------------------------------------------------

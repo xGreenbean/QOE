@@ -22,9 +22,12 @@ class Interaction(PacketContainer):
             return self.clientIP
         else:
             for index, row in self.pcap_df.iterrows():
-                if row['tcp.flags.syn'] == 1 and row['tcp.flags.ack'] == 0:
+                if row['udp.dstport'] == 443:
                     self.clientIP = row['ip.src']
-                    return self.clientIP
+                elif row['tcp.dstport'] == 443:
+                    self.clientIP = row['ip.src']
+                print(self.clientIP)
+                return self.clientIP
 
     """returns List of sessions, a session is a 4 tuple ipsrc,portsrc,ipdst,portdst"""
     ## Maybe should handle better the TCP\UDP seperation.
@@ -33,11 +36,11 @@ class Interaction(PacketContainer):
         if len(self.sessions) == 0:
             sessions_list = []
             for index, row in self.pcap_df.iterrows():
-                if row['udp.srcport'] > 0:
+                if row['udp.srcport'] > 0 and row['udp.dstport'] == 443:
                     curr_5ple = ['UDP', row['ip.src'], row['udp.srcport'], row['ip.dst'], row['udp.dstport']]
-                else:
+                elif row['tcp.dstport'] == 443:
                     curr_5ple = ['TCP', row['ip.src'], row['tcp.srcport'], row['ip.dst'], row['tcp.dstport']]
-                if curr_5ple not in sessions_list and\
+                if curr_5ple and curr_5ple not in sessions_list and\
                         [curr_5ple[0], curr_5ple[3], curr_5ple[4], curr_5ple[1], curr_5ple[2]] not in sessions_list:
                         sessions_list.append(curr_5ple)
                         self.sessions.append(Session(curr_5ple[0], curr_5ple[2],

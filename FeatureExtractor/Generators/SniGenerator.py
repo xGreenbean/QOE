@@ -23,6 +23,7 @@ class SniGenerator:
         all_sni_list = []
         for dirName, subdirList, fileList in os.walk(data_set_path):
             for fname in fileList:
+                print(fname)
                 if fname.endswith('.csv') and 'features' not in fname:
                     df = pd.read_csv(os.path.join(dirName, fname))
                     sni_df = SniGenerator.sni_in_df(df)
@@ -36,6 +37,7 @@ class SniGenerator:
     def sni_in_df(df):
         interaction = Interaction(df)
         all_sessions = interaction.get_sessions()
+
         all_sni = []
         for session in all_sessions:
             all_sni.append(session.get_sni())
@@ -62,6 +64,7 @@ class SniGenerator:
             sni_value = "Other"
         return sni_value
 
-    def save_file(self, file_name, dicts):
+    @staticmethod
+    def save_file(file_name, dicts):
         my_file = open(file_name, "w")
         my_file.write(str(dicts))

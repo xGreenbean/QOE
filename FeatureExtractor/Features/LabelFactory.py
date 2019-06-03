@@ -1,16 +1,14 @@
 import ast
 
 
-class Label:
+class LabelFactory:
 
     @staticmethod
-    def label_by_sni(sni_file_path, sni):
-        with open(sni_file_path, 'r') as fp:
-            file_cont = fp.read()
-            dicts = ast.literal_eval(file_cont)
-            for key, value in dicts.items():
-                if key == sni:
-                    return value
+    def label_by_sni(dicts, sni):
+        for key, value in dicts.items():
+            for val in value:
+                if val in sni:
+                    return key
         return "None"
 
     @staticmethod
@@ -21,12 +19,23 @@ class Label:
             return 2
         elif application == "YouTube":
             return 3
-        elif application == "Other":
+        elif application == "Instagram":
             return 4
+        else:
+            return 5
 
     @staticmethod
     def label_by_video(video):
         if video == "video":
-            return 0
-        elif video == "Other":
             return 1
+        else:
+            return 2
+
+    @staticmethod
+    def label_by_video_video_like(video):
+        if video == "video":
+            return 1
+        elif video == "video_like":
+            return 2
+        else:
+            return 3

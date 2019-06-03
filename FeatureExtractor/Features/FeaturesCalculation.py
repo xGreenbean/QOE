@@ -159,7 +159,7 @@ class FeaturesCalculation:
     """
     def upstream_ssl_v(self):
         if not self.client_hello_pkt.empty:
-            ssl_version = self.client_hello_pkt['tls.handshake.version'].iloc[0]
+            ssl_version = self.client_hello_pkt['ssl.handshake.version'].iloc[0]
             return ssl_version
         return 0
 
@@ -168,7 +168,7 @@ class FeaturesCalculation:
     """
     def upstream_cipher_suites(self):
         if not self.client_hello_pkt.empty:
-            cipher_suites = self.client_hello_pkt['tls.handshake.cipher_suites_length'].iloc[0]/2
+            cipher_suites = self.client_hello_pkt['ssl.handshake.cipher_suites_length'].iloc[0]
             return cipher_suites
         return 0
 
@@ -206,7 +206,7 @@ class FeaturesCalculation:
     def upstream_ssl_num_compression_methods(self):
         df = self.client_hello_pkt
         if not df.empty:
-            return df['tls.handshake.comp_methods_length'].iloc[0]
+            return df['ssl.handshake.comp_methods_length'].iloc[0]
         return 0
 
     """
@@ -215,7 +215,7 @@ class FeaturesCalculation:
     def upstream_ssl_session_id_len(self):
         df = self.client_hello_pkt
         if not df.empty:
-            return df['tls.handshake.session_id_length'].iloc[0]
+            return df['ssl.handshake.session_id_length'].iloc[0]
         return 0
 
     """
