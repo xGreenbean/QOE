@@ -48,7 +48,7 @@ feature_type = "video"
    application by session(size histogram and extension misses),
    ##### These only for TCP session. For udp All tcp&ssl features from flow up need to be gone.  """
 app_vid_top_features = ["max_peak", "min_peak", "std_peak", "mean_peak", "max_silence_time", "min_silence_time",
-                        "mean_silence_time", "std_silence_time", "peaks_count"]
+                        "mean_silence_time", "std_silence_time", "peaks_count", "first_peak"]
 
 app_vid_session_features = ["packet_count", "min_packet_size", "max_packet_size",
                             "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",

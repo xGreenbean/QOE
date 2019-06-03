@@ -4,6 +4,7 @@ from Features.SampleFactory import SampleFactory
 from Generators.CsvGenerator import CsvGenerator
 from Generators.SniGenerator import SniGenerator
 from Configs import conf
+from Features.Vector import Vector
 from datafactory import DataFactory
 import ast
 import os
@@ -63,8 +64,12 @@ def what_the_fuck(sni_app__path, dict_to_convert):
 
 
 if __name__ == '__main__':
-    DataFactory.export_features('app_session')
-    DataFactory.export_features('app_request_response')
-    DataFactory.export_features('video_session')
-    DataFactory.export_features('video_request_response')
-    DataFactory.export_features('video_like_request_response')
+    # DataFactory.export_features('app_session')
+    df = pd.read_csv('/home/cyberlab/Desktop/dataset/iphone_youtube/id_4/raw_iphone7_auto_04_19_id_4.csv')
+    interaction = Interaction(df)
+    for sess in interaction.get_sessions():
+        vec = Vector(sess).get_vector_feature_by_interval(0.1, conf.app_vid_top_features)
+    # DataFactory.export_features('app_request_response')
+    # DataFactory.export_features('video_session')
+    # DataFactory.export_features('video_request_response')
+    # DataFactory.export_features('video_like_request_response')

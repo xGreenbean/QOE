@@ -40,7 +40,8 @@ class TopFeatures:
             return 0
         return peaks_size.max()
 
-
+    def first_peak(self):
+        self.middle_features.first_peak()
     def min_peak(self):
         peaks_size = self.middle_features.peaks_size()
         if np.size(peaks_size) == 0:

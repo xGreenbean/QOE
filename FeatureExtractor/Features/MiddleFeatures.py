@@ -17,7 +17,10 @@ class MiddleFeatures:
         df_list = self.peak_structure()
         peak_sizes = MiddleFeatures.df_array_to_packet_sizes(df_list)
         return np.array(peak_sizes)
-    
+
+    def first_peak(self):
+        print(len(self.peak_structure()))
+
     def peaks_length(self):
         df_list = self.peak_structure()
         peaks_length = MiddleFeatures.df_array_durations(df_list)
