@@ -88,6 +88,10 @@ class MiddleFeatures:
             elif len(frames) != 0:
                 frames_list.append(pd.concat(frames))
                 frames = []
+
+        if len(frames) != 0:
+            frames_list.append(pd.concat(frames))
+            frames = []
         return frames_list
 
 
