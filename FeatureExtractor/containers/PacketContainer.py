@@ -28,22 +28,3 @@ class PacketContainer(object):
             df_list.append(item[1])
         return df_list
 
-    # def split(self, interval):
-    #     counter = 0
-    #     df = self.getSample()
-    #     peak = []
-    #     df_list = []
-    #     start_time = df['frame.time_epoch'].min()
-    #     end_time = df['frame.time_epoch'].max()
-    #     time_interval = end_time - start_time
-    #     for t in range(int(time_interval / interval)):
-    #         for index, row in df.iterrows():
-    #             if abs(row['frame.time_epoch'] - (start_time + t * interval)) <= interval:
-    #                 peak.append(index)
-    #         df_list.append(pd.DataFrame(df.loc[peak]))
-    #         peak.clear()
-    #     for bla in df_list:
-    #         if len(bla) > 0:
-    #             counter += 1
-    #     print("#############################3", counter)
-    #     return df_list
