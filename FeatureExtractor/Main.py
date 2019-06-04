@@ -27,59 +27,25 @@ def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
     print('Done '+device+" "+ott+" id "+str(id_num))
 
 
-def export_features():
-    for device in conf.Devices:
-        for ott in conf.Otts:
-            if device == "onePlus6" and ott == "download":
-                pass
-            else:
-                for i in range(conf.numbers_of_id):
-                    df = pd.read_csv("C:\\Users\\Saimon\\Desktop\\dataset\\" + device + "_" + ott + "\\Id_" + str(
-                        i + 1) + "\\"+device+"_" + ott + "_auto" + str(i + 1) + ".csv")
-                    build_csv_features_per_pcap(df, "C:\\Users\\Saimon\\Desktop\\dataset\\"+device+"_"+ott+"\\Id_"+str(
-                        i+1)+"\\", str(i + 1), ott, device)
-
-
-def create_sni():
-    sni_gen = SniGenerator(conf.video_no_video_sni)
-    all_sni = sni_gen.get_all_sni()
-    dicts = sni_gen.sni_to_label(all_sni)
-    sni_gen.save_file("sni_video_other.txt", dicts)
-
-def what_the_fuck(sni_app__path, dict_to_convert):
-    s = open(sni_app__path, 'r').read()
-    dicts = ast.literal_eval(s)
-    print(dicts)
-    found = False
-
-    for key, value in dicts.items():
-        for k,val in dict_to_convert.items():
-            for v in val:
-               if v in key:
-                   dicts[key] = k
-                   found = True
-
-        if found == False:
-            dicts[key] = "Unknown"
-        else:
-            found = False
-    SniGenerator.save_file("sni_video_video_like.txt", dicts)
-
 
 if __name__ == '__main__':
-    # DataFactory.export_features('app_session')
     start_time = time.time()
     df = pd.read_csv('/home/cyberlab/Desktop/dataset/iphone_youtube/id_4/raw_iphone7_auto_04_19_id_4.csv')
     interaction = Interaction(df)
+
     for sess in interaction.get_sessions():
         print(sess.to_filter())
         vec = Vector(sess).get_vector_feature_by_interval(0.1, conf.app_vid_top_features)
-    # print(len(interaction.get_sessions()))
-    # sessions = Streamer(interaction, 5, 0.01, 50000).get_video_related_sessions()
-    # for sess in sessions:
-    #     print(sess.to_filter())
     print("--- %s seconds ---" % (time.time() - start_time))
+
+
+
+
+
+
+
     # DataFactory.export_features('app_request_response')
     # DataFactory.export_features('video_session')
     # DataFactory.export_features('video_request_response')
     # DataFactory.export_features('video_like_request_response')
+    # DataFactory.export_features('app_session')
