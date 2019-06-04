@@ -45,7 +45,7 @@ class Streamer(PacketContainer):
 
         for time_group in time_groups:
             for index, row in time_group.iterrows():  # aggregate payloads for sessions in time group.
-                key = self.get_session_string(row)  # we need a key for the dictionary
+                key = self.interaction.get_session_string(row)  # we need a key for the dictionary
 
                 if key in sess_payload_dict:
                     sess_payload_dict[key] += row['frame.len']
@@ -97,20 +97,3 @@ class Streamer(PacketContainer):
     def getSample(self):
         return self.video_related_sessions
 
-    """
-    input: data frame row
-    output: a string representing the row. ie port's and ip's.
-    """
-    def get_session_string(self, row):
-        if row['ip.src'] == self.interaction.get_client_ip():
-            if row['tcp.srcport'] > 0:
-                curr_fiveple = ['TCP', row['tcp.srcport'], row['tcp.dstport'], row['ip.src'], row['ip.dst']]
-            else:
-                curr_fiveple = ['UDP', row['udp.srcport'], row['udp.dstport'], row['ip.src'], row['ip.dst']]
-
-        elif row['tcp.srcport'] > 0:
-            curr_fiveple = ['TCP', row['tcp.dstport'], row['tcp.srcport'], row['ip.dst'], row['ip.src']]
-        else:
-            curr_fiveple = ['UDP', row['udp.dstport'], row['udp.srcport'], row['ip.dst'],  row['ip.src']]
-
-        return ''.join(str(x) + ' ' for x in curr_fiveple)

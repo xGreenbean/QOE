@@ -20,12 +20,8 @@ video_videoLike_noVideo = {
     "video_like": []
 }
 
-""" 
-   SNI dictionaries for {SNI:VIDEO,SNI:OTHER} convert by Label class to {sni:0,sni:1} - "sni_video_other.txt"
-    and {SNI:FaceBook,SNI:Netfilx,SNI:YouTube,SNI:Other} converting to {sni:1,sni:2,sni:3,sni:4} - "sni_application.txt"
-"""
 
-sni_to_read = "sni_video_other.txt"
+
 
 """path to dataset"""
 dataset_path = '/home/cyberlab/Desktop/dataset/'
