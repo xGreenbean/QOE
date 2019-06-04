@@ -88,3 +88,11 @@ class Session(PacketContainer):
 
     def to_print(self):
         return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]
+
+    def to_filter(self):
+        if self.protocol == 'TCP':
+            return ('ip.addr==%s && tcp.port==%d && ip.addr==%s && tcp.port==%d'
+                %(self.srcIp, self.srcPort, self.dstIp, self.dstPort))
+        else:
+            return ('ip.addr==%s && udp.port==%d && ip.addr==%s && udp.port==%d'
+                %(self.srcIp, self.srcPort, self.dstIp, self.dstPort))
