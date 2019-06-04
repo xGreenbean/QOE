@@ -6,8 +6,11 @@ from Generators.SniGenerator import SniGenerator
 from Configs import conf
 from Features.Vector import Vector
 from datafactory import DataFactory
+from Streamer import *
 import ast
 import os
+import time
+
 
 def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
     interaction = Interaction(csv_df)
@@ -65,10 +68,17 @@ def what_the_fuck(sni_app__path, dict_to_convert):
 
 if __name__ == '__main__':
     # DataFactory.export_features('app_session')
+    start_time = time.time()
     df = pd.read_csv('/home/cyberlab/Desktop/dataset/iphone_youtube/id_4/raw_iphone7_auto_04_19_id_4.csv')
     interaction = Interaction(df)
     for sess in interaction.get_sessions():
+        print(sess.to_filter())
         vec = Vector(sess).get_vector_feature_by_interval(0.1, conf.app_vid_top_features)
+    # print(len(interaction.get_sessions()))
+    # sessions = Streamer(interaction, 5, 0.01, 50000).get_video_related_sessions()
+    # for sess in sessions:
+    #     print(sess.to_filter())
+    print("--- %s seconds ---" % (time.time() - start_time))
     # DataFactory.export_features('app_request_response')
     # DataFactory.export_features('video_session')
     # DataFactory.export_features('video_request_response')
