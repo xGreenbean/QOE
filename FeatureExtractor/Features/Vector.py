@@ -45,5 +45,8 @@ class Vector:
         results = []
         for feature in ft_l:
             method = getattr(ft, feature)
-            results.append(method())
+            if feature == "first_peak":
+                results.extend(method())
+            else:
+                results.append(method())
         return results
