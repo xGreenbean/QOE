@@ -123,4 +123,12 @@ class DataFactory:
                 if fname.endswith('.csv') and fname.startswith('features'):
                     os.remove(os.path.join(dirName, fname))
 
-
+    @staticmethod
+    def print_dates():
+        for dirName, subdirList, fileList in os.walk(conf.dataset_path):
+            for fname in fileList:
+                if fname.endswith('.csv') and fname.startswith('raw'):
+                    df = pd.read_csv(os.path.join(dirName, fname))
+                    if len(df['frame.time']) > 0:
+                        print(os.path.join(dirName, fname))
+                        print(df['frame.time'][0])
