@@ -8,7 +8,7 @@ application_sni = {
     "FaceBook": ["fbcdn", "graph"],
     "YouTube": ["googlevideo"],
     "Instagram": ["cdnistagram"],
-    "OtherOTT": []
+    "OtherOTT": ["video.twimg.com", "cnnios-f.akamaihd.net"]
 }
 
 video_no_video_sni = {
@@ -44,7 +44,8 @@ feature_type = "video"
    application by session(size histogram and extension misses),
    ##### These only for TCP session. For udp All tcp&ssl features from flow up need to be gone.  """
 app_vid_top_features = ["max_peak", "min_peak", "std_peak", "mean_peak", "max_silence_time", "min_silence_time",
-                        "mean_silence_time", "std_silence_time", "peaks_count", "first_peak"]
+                        "mean_silence_time", "std_silence_time", "peaks_count",
+                        "max_peak_length", "min_peak_length", "std_peak_length", "mean_peak_length", "first_peak"]
 
 app_vid_session_features = ["packet_count", "min_packet_size", "max_packet_size",
                             "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
@@ -65,4 +66,9 @@ response_request_top_features = ["max_response_request", "min_response_request",
                                                  "min_response_request_delta_time", "max_response_request_delta_time",
                                                  "std_response_request_delta_time", "mean_response_request_delta_time",
                                                  "request_response_count"]
+
+first_peak_features = ["packets_size", "packet_count", "min_packet_size", "max_packet_size",
+                            "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
+                            "min_time_delta", "mean_time_delta"]
+
 # ------------------------------------------------------------------------------------------------------------------

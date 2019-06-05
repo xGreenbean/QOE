@@ -1,6 +1,7 @@
 from Features.FeaturesCalculation import FeaturesCalculation
 import numpy as np
 import pandas as pd
+from Configs import conf
 """
 the class get array of dataframes  , for each dataframe 
 we calculate features on that df using FeaturesCalculation 
@@ -13,13 +14,19 @@ class MiddleFeatures:
     def __init__(self, pc):
         self.pc = pc
 
+    def first_peak_features(self):
+        df = self.peak_structure()[0]
+        fc = FeaturesCalculation(df)
+        features_result = []
+        for feature in conf.first_peak_features:
+            method = getattr(fc, feature)
+            features_result.append(str(method()))
+        return features_result
+
     def peaks_size(self):
         df_list = self.peak_structure()
         peak_sizes = MiddleFeatures.df_array_to_packet_sizes(df_list)
         return np.array(peak_sizes)
-
-    def first_peak(self):
-        print(len(self.peak_structure()))
 
     def peaks_length(self):
         df_list = self.peak_structure()
@@ -83,15 +90,15 @@ class MiddleFeatures:
         frames = []
         frames_list = []
         for interval in self.pc:
-            if len(interval) != 0:
+            if len(interval) > 0:
                 frames.append(interval)
-            elif len(frames) != 0:
+            elif len(frames) > 0:
                 frames_list.append(pd.concat(frames))
                 frames = []
 
         if len(frames) != 0:
             frames_list.append(pd.concat(frames))
-            frames = []
+
         return frames_list
 
 

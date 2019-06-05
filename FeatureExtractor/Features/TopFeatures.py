@@ -2,8 +2,10 @@ from Features.MiddleFeatures import MiddleFeatures
 import numpy as np
 
 
-class TopFeatures:
 
+class TopFeatures:
+    #static variable
+    skip_first = False
     def __init__(self, pc_array):
         self.middle_features = MiddleFeatures(pc_array)
 
@@ -38,54 +40,107 @@ class TopFeatures:
         peaks_size = self.middle_features.peaks_size()
         if np.size(peaks_size) == 0:
             return 0
+        if TopFeatures.skip_first:
+            peaks_size = peaks_size[1:]
         return peaks_size.max()
 
     def first_peak(self):
-        self.middle_features.first_peak()
+        return self.middle_features.first_peak_features()
+
     def min_peak(self):
         peaks_size = self.middle_features.peaks_size()
         if np.size(peaks_size) == 0:
             return 0
+        if TopFeatures.skip_first:
+            peaks_size = peaks_size[1:]
         return peaks_size.min()
 
     def mean_peak(self):
         peaks_size = self.middle_features.peaks_size()
         if np.size(peaks_size) == 0:
             return 0
+        if TopFeatures.skip_first:
+            peaks_size = peaks_size[1:]
         return peaks_size.mean()
 
     def std_peak(self):
         peaks_size = self.middle_features.peaks_size()
         if np.size(peaks_size) == 0:
             return 0
+        if TopFeatures.skip_first:
+            peaks_size = peaks_size[1:]
         return peaks_size.std()
 
     def max_silence_time(self):
         silences_deltas = self.middle_features.silences_deltas()
         if np.size(silences_deltas) == 0:
             return 0
+        if TopFeatures.skip_first:
+            silences_deltas = silences_deltas[1:]
         return silences_deltas.max()
 
     def min_silence_time(self):
         silences_deltas = self.middle_features.silences_deltas()
         if np.size(silences_deltas) == 0:
             return 0
+        if TopFeatures.skip_first:
+            silences_deltas = silences_deltas[1:]
         return silences_deltas.min()
 
     def mean_silence_time(self):
         silences_deltas = self.middle_features.silences_deltas()
         if np.size(silences_deltas) == 0:
             return 0
+        if TopFeatures.skip_first:
+            silences_deltas = silences_deltas[1:]
         return silences_deltas.mean()
 
     def std_silence_time(self):
         silences_deltas = self.middle_features.silences_deltas()
         if np.size(silences_deltas) == 0:
             return 0
+        if TopFeatures.skip_first:
+            silences_deltas = silences_deltas[1:]
         return silences_deltas.std()
 
+    def max_peak_length(self):
+        peaks_length = self.middle_features.peaks_length()
+        if np.size(peaks_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            peaks_length = peaks_length[1:]
+        return peaks_length.max()
+
+    def min_peak_length(self):
+        peaks_length = self.middle_features.peaks_length()
+        if np.size(peaks_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            peaks_length = peaks_length[1:]
+        return peaks_length.min()
+
+    def mean_peak_length(self):
+        peaks_length = self.middle_features.peaks_length()
+        if np.size(peaks_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            peaks_length = peaks_length[1:]
+        return peaks_length.mean()
+
+    def std_peak_length(self):
+        peaks_length = self.middle_features.peaks_length()
+        if np.size(peaks_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            peaks_length = peaks_length[1:]
+        return peaks_length.std()
+    #--------------------------------------------
+
     def peaks_count(self):
-        return len(self.middle_features.peaks_size())
+        peaks = self.middle_features.peaks_size()
+        if len(peaks) != 0 and TopFeatures.skip_first:
+            peaks = peaks[1:]
+        return len(peaks)
 
     def max_response_request(self):
         peaks_size = self.middle_features.response_request_sizes()

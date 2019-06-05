@@ -21,8 +21,10 @@ class LabelFactory:
             return 3
         elif application == "Instagram":
             return 4
-        else:
+        elif application == "OtherOTT":
             return 5
+        else:
+            return 6
 
     @staticmethod
     def label_by_video(video):

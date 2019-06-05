@@ -24,6 +24,7 @@ class PacketContainer(object):
         df['date'] = df['frame.time_epoch'].apply(datetime.datetime.fromtimestamp)
         group_intervals = df.groupby(pd.Grouper(key='date', freq=(str(intervals) + 'S')))
         df_list = []
+        counter = 0
         for item in group_intervals:
             df_list.append(item[1])
         return df_list

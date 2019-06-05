@@ -9,6 +9,7 @@ from datafactory import DataFactory
 from Streamer import *
 import ast
 import os
+from Breaker import Breaker
 import time
 
 
@@ -27,7 +28,6 @@ def build_csv_features_per_pcap(csv_df, path, id_num, ott, device):
     print('Done '+device+" "+ott+" id "+str(id_num))
 
 
-
 if __name__ == '__main__':
     start_time = time.time()
     df = pd.read_csv('/home/cyberlab/Desktop/dataset/iphone_youtube/id_4/raw_iphone7_auto_04_19_id_4.csv')
@@ -35,13 +35,12 @@ if __name__ == '__main__':
 
     for sess in interaction.get_sessions():
         print(sess.to_filter())
-        vec = Vector(sess).get_vector_feature_by_interval(0.1, conf.app_vid_top_features)
+        #br = Breaker(sess,0.05,250)
+        #vec = Vector(sess).get_vector_feature_by_interval(0.1, conf.app_vid_top_features)
+        #vec = Vector(br).get_vector_by_request_response_bins(5, conf.app_vid_top_features)
+        #print(conf.app_vid_top_features)
+        #print(vec)
     print("--- %s seconds ---" % (time.time() - start_time))
-
-
-
-
-
 
 
     # DataFactory.export_features('app_request_response')
