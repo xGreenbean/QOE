@@ -60,6 +60,7 @@ class DataFactory:
         for dirName, subdirList, fileList in os.walk(conf.dataset_path):
             for fname in fileList:
                 if fname.endswith('.csv') and fname.startswith('raw'):
+                    print(os.path.join(dirName, fname))
                     interaction = Interaction(pd.read_csv(os.path.join(dirName, fname)))
                     all_sessions = interaction.get_sessions()
                     tcp_data = []
@@ -84,7 +85,6 @@ class DataFactory:
                     tcp_data.append(headers)
                     for session in all_sessions:
                         if feature_type == 'app_session':
-                            print(session.to_filter())
                             sample = SampleFactory.application_by_session(session, 0.1, dirName, with_first, is_skip)
                             tcp_data.append(sample)
                         elif feature_type == 'app_peak_session_only':

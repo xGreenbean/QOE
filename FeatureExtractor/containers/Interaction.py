@@ -45,13 +45,15 @@ class Interaction(PacketContainer):
                         sessions_list.append(curr_fiveple)
                         sess = Session(curr_fiveple[0], curr_fiveple[2],
                                                      curr_fiveple[4], curr_fiveple[1], curr_fiveple[3], self.pcap_df)
-
-                        self.sessions.append(sess)
-                        curr_fiveple = [curr_fiveple[0], curr_fiveple[2],
-                                                     curr_fiveple[4], curr_fiveple[1], curr_fiveple[3]]
-                        sess_key = ''.join(str(x) + ' ' for x in curr_fiveple)
-                        self.sess_dict[sess_key] = sess
-                        curr_fiveple.clear()
+                        if len(sess.getSample()) > 1:
+                            self.sessions.append(sess)
+                            curr_fiveple = [curr_fiveple[0], curr_fiveple[2],
+                                                         curr_fiveple[4], curr_fiveple[1], curr_fiveple[3]]
+                            sess_key = ''.join(str(x) + ' ' for x in curr_fiveple)
+                            self.sess_dict[sess_key] = sess
+                            curr_fiveple.clear()
+                        else:
+                            pass
 
         return self.sessions
 
