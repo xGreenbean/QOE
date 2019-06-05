@@ -12,11 +12,11 @@ application_sni = {
 }
 
 video_no_video_sni = {
-    "video": ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram"]
+    "video": ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"]
 }
 
 video_videoLike_noVideo = {
-    "video": ["nflxvideo", "fbcdn", "googlevideo","cdnistagram"],
+    "video": ["nflxvideo", "fbcdn", "googlevideo","cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"],
     "video_like": []
 }
 
@@ -27,16 +27,8 @@ video_videoLike_noVideo = {
 dataset_path = '/home/cyberlab/Desktop/dataset/'
 # ------------------------------------------------------------------------------------------------------------------
 
-# ----------------------------------- Parameters for  Data factory iterators ---------------------------------------
 
-Otts = ["YouTube", "Netflix", "FaceBook", "download"]
-Devices = ["onePlus6", "iphone7"]
-numbers_of_id = 5
 
-"""
-    Reading data set for features need to include video or app string to decide which features to get 
-"""
-feature_type = "video"
 
 # ---------------------------------- Video/non and Application features for classification  -------------------------
 
@@ -65,7 +57,9 @@ response_request_top_features = ["max_response_request", "min_response_request",
                                                  "mean_response_request", "max_response_request",
                                                  "min_response_request_delta_time", "max_response_request_delta_time",
                                                  "std_response_request_delta_time", "mean_response_request_delta_time",
-                                                 "request_response_count"]
+                                                "max_request_response_length","min_request_response_length",
+                                                "mean_request_response_length", "std_request_response_length",
+                                 "request_response_count"]
 
 first_peak_features = ["packets_size", "packet_count", "min_packet_size", "max_packet_size",
                             "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",

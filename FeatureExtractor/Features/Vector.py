@@ -13,7 +13,7 @@ class Vector:
         results = []
         for feature in ft_l:
             method = getattr(fc, feature)
-            results.append(str(method()))
+            results.append(method())
         return results
 
     def get_vector_by_request_response_bins(self, bin_size, ft_l):
@@ -24,8 +24,11 @@ class Vector:
             bin_result = []
             for feature in ft_l:
                 method = getattr(fc, feature)
-                bin_result.append(str(method()))
-            all_results.append(bin_result)
+                if feature == "first_peak":
+                    bin_result.extend(method())
+                else:
+                    bin_result.append(method())
+            all_results.append(list(bin_result))
         return all_results
 
     def get_vector_by_streamer(self):
@@ -37,16 +40,20 @@ class Vector:
         results = []
         for feature in fc_l:
             method = getattr(fc, feature)
-            results.append(str(method()))
+            results.append(method())
         return results
 
-    def get_vector_feature_by_interval(self, interval, ft_l):
+    def get_vector_feature_by_interval(self, interval, ft_l, is_skip, with_first_peak):
         ft = TopFeatures(self.pc.split(interval))
+        ft.skip_first = is_skip
         results = []
         for feature in ft_l:
             method = getattr(ft, feature)
             if feature == "first_peak":
-                results.extend(method())
+                if with_first_peak:
+                    results.extend(method())
+                else:
+                    pass
             else:
                 results.append(method())
         return results

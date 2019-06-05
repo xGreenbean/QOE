@@ -56,7 +56,7 @@ class DataFactory:
         sni_gen.save_file(file_name, dict2s)
 
     @staticmethod
-    def export_features(feature_type):
+    def export_features(feature_type, is_skip, with_first):
         for dirName, subdirList, fileList in os.walk(conf.dataset_path):
             for fname in fileList:
                 if fname.endswith('.csv') and fname.startswith('raw'):
@@ -64,7 +64,15 @@ class DataFactory:
                     all_sessions = interaction.get_sessions()
                     tcp_data = []
                     if feature_type == 'app_session':
-                        headers = SampleFactory.session_headers()
+                        headers = SampleFactory.session_headers(with_first)
+                    elif feature_type == 'app_peak_session_only':
+                        headers = SampleFactory.session_peaks_headers(with_first)
+                    elif feature_type == 'app_rr_session_only':
+                        headers = SampleFactory.session_request_response_headers()
+                    elif feature_type == 'video_peak_session_only':
+                        headers = SampleFactory.session_peaks_headers(with_first)
+                    elif feature_type == 'video_rr_session_only':
+                        headers = SampleFactory.session_request_response_headers()
                     elif feature_type == 'app_request_response':
                         headers = SampleFactory.session_request_response_headers()
                     elif feature_type == 'video_session':
@@ -76,8 +84,18 @@ class DataFactory:
                     tcp_data.append(headers)
                     for session in all_sessions:
                         if feature_type == 'app_session':
-                            sample = SampleFactory.application_by_session(session, 0.1, dirName)
+                            print(session.to_filter())
+                            sample = SampleFactory.application_by_session(session, 0.1, dirName, with_first, is_skip)
                             tcp_data.append(sample)
+                        elif feature_type == 'app_peak_session_only':
+                            sample = SampleFactory.app_peaks_only(session, 0.1, dirName, with_first, is_skip)
+                            tcp_data.append(sample)
+                        elif feature_type == 'app_rr_session_only':
+                            headers = SampleFactory.app_rr_only(session, 0.05, 250, dirName)
+                        elif feature_type == 'video_peak_session_only':
+                            headers = SampleFactory.video_peaks_only(session, 0.1, dirName, with_first, is_skip)
+                        elif feature_type == 'video_rr_session_only':
+                            headers = SampleFactory.video_rr_only(session, 0.05, 250, dirName)
                         elif feature_type == 'app_request_response':
                             sample = SampleFactory.application_by_request_response_session(session, 5, 0.05,
                                                                                      250, dirName)
@@ -98,9 +116,24 @@ class DataFactory:
                                 tcp_data.append(vector)
 
                     if feature_type == 'app_session':
-                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_by_sessions_features')), tcp_data)
+                        if with_first:
+                            csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_with_first_'+str(is_skip)+'_Flag_by_sessions_features')), tcp_data)
+                        else:
+                            csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_by_sessions_features')), tcp_data)
                     elif feature_type == 'app_request_response':
                         csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_by_req_res_features')), tcp_data)
+                    elif feature_type == 'app_peak_session_only':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_peak_session_features')),
+                                           tcp_data)
+                    elif feature_type == 'app_rr_session_only':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'app_rr_session_features')),
+                                           tcp_data)
+                    elif feature_type == 'video_peak_session_only':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'video_peak_session_features')),
+                                           tcp_data)
+                    elif feature_type == 'video_rr_session_only':
+                        csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'video_rr_session_features')),
+                                           tcp_data)
                     elif feature_type == 'video_session':
                         csv = CsvGenerator(os.path.join(dirName, fname.replace('raw', 'video_by_session_features')), tcp_data)
                     elif feature_type == 'video_request_response':

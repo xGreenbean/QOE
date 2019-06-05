@@ -15,9 +15,13 @@ def run_rfr(test_size, num_trees, rs_test_train, rs_regressor):
     # Read in data and display first 5 rows
     feature_type = 'video_like_req_res_features'
     features = draw_features(feature_type)
-    print(len(features[features['Label'] == 1]))
-    print(len(features[features['Label'] == 2]))
-    print(len(features[features['Label'] == 3]))
+    print(len(features[features['Label'] == 1]), 'FaceBook')
+    print(len(features[features['Label'] == 2]), 'Netflix')
+    print(len(features[features['Label'] == 3]), 'YouTube')
+    print(len(features[features['Label'] == 4]), 'Instagram')
+    print(len(features[features['Label'] == 5]), 'OtherOTT')
+    print(len(features[features['Label'] == 6]), 'Unknown')
+
 
     #   only for video/no video, for app remove
 

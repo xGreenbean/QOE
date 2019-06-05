@@ -1,5 +1,5 @@
 import csv
-
+from Configs import conf
 """
     Class CsvGenartor gets path and csv_data in format of a list and creates csv file containing that data.
     The class also holds function to manipulate csv data and make it ready to export.
@@ -25,7 +25,12 @@ class CsvGenerator:
     def custom_headers(list_headers, word_custom):
         custom_list = []
         for string in list_headers:
-            custom_list.append(word_custom + "_" + string)
+            if string != "first_peak":
+                custom_list.append(word_custom +"_" + string)
+            else:
+                for feature in conf.first_peak_features:
+                    custom_list.append(word_custom+"_first_peak_"+feature)
+
         return custom_list
 
     """Static function custom_headers gets a array which each item is a list and simply combine them into one array with 

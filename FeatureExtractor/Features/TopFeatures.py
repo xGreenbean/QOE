@@ -192,3 +192,35 @@ class TopFeatures:
 
     def request_response_count(self):
         return len(self.middle_features.response_request_sizes())
+
+    def max_request_response_length(self):
+        request_response_length = self.middle_features.request_response_length()
+        if np.size(request_response_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            request_response_length = request_response_length[1:]
+        return request_response_length.max()
+
+    def min_request_response_length(self):
+        request_response_length = self.middle_features.request_response_length()
+        if np.size(request_response_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            request_response_length = request_response_length[1:]
+        return request_response_length.min()
+
+    def mean_request_response_length(self):
+        request_response_length = self.middle_features.request_response_length()
+        if np.size(request_response_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            request_response_length = request_response_length[1:]
+        return request_response_length.mean()
+
+    def std_request_response_length(self):
+        request_response_length = self.middle_features.request_response_length()
+        if np.size(request_response_length) == 0:
+            return 0
+        if TopFeatures.skip_first:
+            request_response_length = request_response_length[1:]
+        return request_response_length.std()

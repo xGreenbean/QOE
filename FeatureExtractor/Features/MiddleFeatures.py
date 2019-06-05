@@ -23,6 +23,15 @@ class MiddleFeatures:
             features_result.append(str(method()))
         return features_result
 
+    def first_request_response_features(self):
+        df = self.pc[0]
+        fc = FeaturesCalculation(df)
+        features_result = []
+        for feature in conf.first_peak_features:
+            method = getattr(fc, feature)
+            features_result.append(str(method()))
+        return features_result
+
     def peaks_size(self):
         df_list = self.peak_structure()
         peak_sizes = MiddleFeatures.df_array_to_packet_sizes(df_list)
