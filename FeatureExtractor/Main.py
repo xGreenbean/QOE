@@ -14,7 +14,7 @@ import time
 
 if __name__ == '__main__':
     #start_time = time.time()
-    #df = pd.read_csv('/home/cyberlab/Desktop/dataset/iphone_youtube/id_4/raw_iphone7_auto_04_19_id_4.csv')
+    #df = pd.read_csv('/home/cyberlab/Desktop/dataset/iphone_youtube/id_4')
     #interaction = Interaction(df)
 
     #for sess in interaction.get_sessions():
@@ -33,10 +33,10 @@ if __name__ == '__main__':
     #DataFactory.export_features('video_request_response')
     #DataFactory.export_features('video_like_request_response')
     DataFactory.export_features('app_session',False, True)
-    DataFactory.export_features('app_session', True, True)
-    DataFactory.export_features('app_session', False, False)
-    DataFactory.export_features('app_peak_session_only', False, False)
-    DataFactory.export_features('video_peak_session_only', False, False)
-    DataFactory.export_features('app_rr_session_only', False, False)
-    DataFactory.export_features('video_rr_session_only', False, False)
+    # DataFactory.export_features('app_session', True, True)
+    # DataFactory.export_features('app_session', False, False)
+    # DataFactory.export_features('app_peak_session_only', False, False)
+    # DataFactory.export_features('video_peak_session_only', False, False)
+    # DataFactory.export_features('app_rr_session_only', False, False)
+    # DataFactory.export_features('video_rr_session_only', False, False)
 

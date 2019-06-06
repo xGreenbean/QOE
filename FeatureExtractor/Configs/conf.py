@@ -24,7 +24,7 @@ video_videoLike_noVideo = {
 
 
 """path to dataset"""
-dataset_path = '/home/cyberlab/Desktop/dataset/'
+dataset_path = '/home/cyberlab/Desktop/dataset'
 # ------------------------------------------------------------------------------------------------------------------
 
 

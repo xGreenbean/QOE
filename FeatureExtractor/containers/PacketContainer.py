@@ -21,6 +21,7 @@ class PacketContainer(object):
     """
     def split(self, intervals):
         df = self.getSample()
+        df = df.dropna(subset=['frame.time_epoch'])
         df['date'] = df['frame.time_epoch'].apply(datetime.datetime.fromtimestamp)
         group_intervals = df.groupby(pd.Grouper(key='date', freq=(str(intervals) + 'S')))
         df_list = []
