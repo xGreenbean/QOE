@@ -1,0 +1,31 @@
+import pandas as pd
+import datetime
+
+class Peaker(object):
+    """delta_t is time in seconds, to group the dataframe by"""
+    def __init__(self, df, delta_t):
+        self.delta_t = delta_t
+        self.df = df
+
+    """returns an array of data frames, where each data frame is a peak"""
+    def get_dfs(self):
+        self.df = self.df.dropna(subset=['frame.time_epoch'])
+        self.df['date'] = self.df['frame.time_epoch'].apply(datetime.datetime.fromtimestamp)
+        group_intervals = self.df.groupby(pd.Grouper(key='date', freq=(str(self.delta_t) + 'S')))
+        df_list = []
+        for item in group_intervals:
+            df_list.append(item[1])
+
+        peak = []
+        peaks = []
+        for interval in df_list:
+            if len(interval) > 0:
+                peak.append(interval)
+            elif len(peak) > 0:
+                peaks.append(pd.concat(peak))
+                peak = []
+
+        if len(peak) != 0:
+            peaks.append(pd.concat(peak))
+
+        return peaks
