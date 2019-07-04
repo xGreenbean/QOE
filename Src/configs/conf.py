@@ -39,6 +39,8 @@ app_top = ["max_peak", "min_peak", "std_peak", "mean_peak", "max_silence_time", 
                         "mean_silence_time", "std_silence_time", "peaks_count",
                         "max_peak_length", "min_peak_length", "std_peak_length", "mean_peak_length", "first_peak"]
 
+app_agg = ["max_element_size", "min_element_size", "mean_element_size", "std_element_size", ]
+
 app_sess = ["packet_count", "min_packet_size", "max_packet_size",
                             "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
                             "min_time_delta", "mean_time_delta"]

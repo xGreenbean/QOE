@@ -12,13 +12,19 @@ sess - Session DataFrame
 
 class FeaturesCalculation:
 
-    def __init__(self, pc):
-        self.df = pc
-        df = self.df
+    def __init__(self, df):
+        self.df = df
         """ Get client hello """
         self.client_hello_pkt = df[df['ssl.handshake.extensions_server_name'].notnull()]
         """ Get SYN packet """
         self.syn_pkt = df[(df['tcp.flags.syn'] == 1) & (df['tcp.flags.ack'] == 0)]
+    
+    def apply(self, feature_list):
+        vector = []
+        for feature in feature_list:
+            method = getattr(self, feature)
+            vector.append(method())
+        return vector
 
     """ Length in seconds """
     def duration(self):
