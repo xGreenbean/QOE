@@ -1,7 +1,7 @@
 from containers.Interaction import *
-from Streamer import *
+from tools.Streamer import *
 import pandas as pd
-from Configs import conf
+from configs import conf
 import os
 
 
@@ -22,7 +22,7 @@ for dirName, subdirList, fileList in os.walk(conf.dataset_path):
             for video_sess in video_sessions:
 
                 found = False
-                for val in conf.video_no_video_sni['video']:
+                for val in conf.video['video']:
 
                     if val in video_sess.get_sni():
                         true_positive += 1
@@ -35,7 +35,7 @@ for dirName, subdirList, fileList in os.walk(conf.dataset_path):
 
                 found = False
 
-                for val in conf.video_no_video_sni['video']:
+                for val in conf.video['video']:
 
                     if val in not_video_sess.get_sni():
                         false_negative += 1

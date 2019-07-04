@@ -1,6 +1,6 @@
 import pandas as pd
 from containers.Interaction import Interaction
-from Configs import conf
+from configs import conf
 global data_set_path
 import os
 

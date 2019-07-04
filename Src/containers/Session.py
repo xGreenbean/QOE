@@ -1,6 +1,6 @@
 from containers.Flow import *
 from containers.PacketContainer import PacketContainer
-from Features.FeaturesCalculation import FeaturesCalculation
+from features.FeaturesCalculation import FeaturesCalculation
 """
 Class Session
     define session by 5-tuple: Protocol, ip,port source and destination

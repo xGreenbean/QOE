@@ -1,6 +1,5 @@
-from Breaker import *
+from tools.Breaker import *
 from containers.Interaction import *
-import os
 
 
 def test(pcap_csv_path, pcap_csv_label_path):

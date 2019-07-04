@@ -1,5 +1,5 @@
 import csv
-from Configs import conf
+from configs import conf
 """
     Class CsvGenartor gets path and csv_data in format of a list and creates csv file containing that data.
     The class also holds function to manipulate csv data and make it ready to export.
