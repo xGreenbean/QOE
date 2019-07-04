@@ -17,14 +17,16 @@ class Session(PacketContainer):
         self.dstIp = dst_ip
         self.dstPort = dst_port
         self.protocol = protocol
+
         if protocol == "TCP":
-            self.all_packets = self.get_all_tcps(csv_file)
+            self.df = self.get_all_tcps(csv_file)
         elif protocol == "UDP":
-            self.all_packets = self.get_all_udps(csv_file)
-        f_up, f_down = self.find_uploads_downloads()
+            self.df = self.get_all_udps(csv_file)
+        f_up, f_down = self.get_flows()
+
         self.flow_up = Flow(f_up)
         self.flow_down = Flow(f_down)
-        self.connection_opening_time = self.all_packets['frame.time_epoch'].min()
+        self.connection_opening_time = self.df['frame.time_epoch'].min()
 
     """
         The function get all the packet in the pcap file, filters the right ip's and then filter all the packets 
@@ -58,17 +60,14 @@ class Session(PacketContainer):
     """
         This function separate all session packets to up flows and down flows based on ip.src defined to the session
     """
-    def find_uploads_downloads(self):
-        pd = self.all_packets
+    def get_flows(self):
+        pd = self.df
         uploads = pd[pd['ip.src'] == self.srcIp]
         downloads = pd[pd['ip.src'] == self.dstIp]
         return uploads, downloads
 
-    def getSample(self):
-        return self.all_packets
-
     def get_session_size(self):
-        fc = FeaturesCalculation(self.all_packets)
+        fc = FeaturesCalculation(self.df)
         return fc.packets_size()
 
     """
@@ -76,7 +75,7 @@ class Session(PacketContainer):
     """
 #   csv files from dataset don't have gquic.tag.sni column, Return "None" for now since exporting tcp features only
     def get_sni(self):
-        flow_up_df = self.flow_up.getSample()
+        flow_up_df = self.flow_up.get_df()
         if self.protocol == 'TCP':
             sni_filter = "ssl.handshake.extensions_server_name"
         else:
@@ -86,7 +85,7 @@ class Session(PacketContainer):
             return "None"
         return str(df[sni_filter].iloc[0])
 
-    def to_print(self):
+    def to_string(self):
         return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]
 
     def to_filter(self):

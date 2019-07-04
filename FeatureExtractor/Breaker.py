@@ -1,6 +1,12 @@
 from containers.Session import *
 import pandas as pd
 
+"""
+Class Breaker
+    Breaks a session into Request and Response pieces,
+    A request followed by a response from now one will be called an 'act'. 
+    act: like a part of a play, or 'מערכה' in hebrew
+"""
 
 class Breaker(object):
     def __init__(self, session, delta_t, threshold_t):
@@ -13,43 +19,43 @@ class Breaker(object):
 
     """returns pandas dataframe[], with each element being a request and its response"""
     def sess_break(self):
-        requests_responses = []
+        acts = []
         request_start_time = 0
-        request_response = []
+        act = []
         for index, row in self.session.all_packets.iterrows():
 
             """check for clients packets requests"""
             if row['ip.src'] == self.session.srcIp and row['frame.len'] > self.threshold_t and\
                     (request_start_time == 0 or row['frame.time_epoch'] - request_start_time > self.delta_t):
 
-                if request_response:
-                    requests_responses.append(pd.DataFrame(self.session.all_packets.loc[request_response]))
-                    request_response.clear()
+                if act:
+                    acts.append(pd.DataFrame(self.session.all_packets.loc[act]))
+                    act.clear()
 
                 request_start_time = row['frame.time_epoch']
-                request_response.append(index)
+                act.append(index)
 
             else:
-                if request_response:
-                    request_response.append(index)
+                if act:
+                    act.append(index)
 
-        if request_response:
-            requests_responses.append(pd.DataFrame(self.session.all_packets.loc[request_response]))
+        if act:
+            acts.append(pd.DataFrame(self.session.all_packets.loc[act]))
 
-        return requests_responses
+        return acts
 
     def getSample(self):
         return self.sess_break()
 
-    def split(self, bins_size):
+    def split(self, bin_size):
         request_response = self.sess_break()
         bins_list = []
         df = []
-        if len(request_response) < bins_size:
+        if len(request_response) < bin_size:
             bins_list.append(request_response)
             return bins_list
-        for i in range(len(request_response) - bins_size + 1):
-            for j in range(bins_size):
+        for i in range(len(request_response) - bin_size + 1):
+            for j in range(bin_size):
                 df.append(request_response[i + j])
             bins_list.append(df)
             df = []

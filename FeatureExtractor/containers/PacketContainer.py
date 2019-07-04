@@ -7,20 +7,20 @@ import datetime
 
 class PacketContainer(object):
 
-    def __init__(self, data_frame):
-        self.df = data_frame
+    def __init__(self, df):
+        self.df = df
 
     """
         function return the df frame the PacketContainer class holds 
     """
-    def getSample(self):
-        return self.data_frame
+    def get_df(self):
+        return self.df
 
     """
          Function split the df to interval in seconds and return list of data frames, each item is interval 
     """
     def split(self, intervals):
-        df = self.getSample()
+        df = self.get_df()
         df = df.dropna(subset=['frame.time_epoch'])
         df['date'] = df['frame.time_epoch'].apply(datetime.datetime.fromtimestamp)
         group_intervals = df.groupby(pd.Grouper(key='date', freq=(str(intervals) + 'S')))

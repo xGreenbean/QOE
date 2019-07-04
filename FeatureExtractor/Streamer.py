@@ -32,7 +32,7 @@ class Streamer(PacketContainer):
     def get_video_related_sessions(self):
         #prepare sessions time_groups
         time_groups = []
-        df = self.interaction.getSample()
+        df = self.interaction.get_df()
         df['date'] = df['frame.time_epoch'].\
             apply(datetime.datetime.fromtimestamp)  # convert epoch to datetime.
 

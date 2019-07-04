@@ -13,7 +13,6 @@ sess - Session DataFrame
 class FeaturesCalculation:
 
     def __init__(self, pc):
-        self.first_packet = pc.head()
         self.df = pc
         df = self.df
         """ Get client hello """

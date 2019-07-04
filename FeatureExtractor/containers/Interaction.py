@@ -11,17 +11,18 @@ Class Interaction
 
 class Interaction(PacketContainer):
 
-    def __init__(self, pcap_df):
+    def __init__(self, df):
         self.clientIP = 0
-        self.pcap_df = pcap_df
+        self.df = df
         self.sessions = []
         self.sess_dict = {}
-    """returns client's ip, we take the ip.src from the first packet where tcp.syn = 1 and tcp.ack = 0 """
+
+    """returns client's ip, we take the ip.src from the first packet where dstport == 443 """
     def get_client_ip(self):
         if self.clientIP != 0:
             return self.clientIP
         else:
-            for index, row in self.pcap_df.iterrows():
+            for index, row in self.df.iterrows():
                 if row['udp.dstport'] > 0 and row['udp.dstport'] == 443:
                     self.clientIP = row['ip.src']
                 elif row['tcp.dstport'] == 443:
@@ -34,7 +35,7 @@ class Interaction(PacketContainer):
         curr_fiveple = None
         if len(self.sessions) == 0:
             sessions_list = []
-            for index, row in self.pcap_df.iterrows():
+            for index, row in self.df.iterrows():
                 if row['udp.dstport'] > 0 and row['udp.dstport'] == 443:
                     curr_fiveple = ['UDP', row['ip.src'], row['udp.srcport'], row['ip.dst'], row['udp.dstport']]
 
@@ -44,8 +45,8 @@ class Interaction(PacketContainer):
                 if curr_fiveple and curr_fiveple not in sessions_list:
                         sessions_list.append(curr_fiveple)
                         sess = Session(curr_fiveple[0], curr_fiveple[2],
-                                                     curr_fiveple[4], curr_fiveple[1], curr_fiveple[3], self.pcap_df)
-                        if len(sess.getSample()) > 1:
+                                       curr_fiveple[4], curr_fiveple[1], curr_fiveple[3], self.df)
+                        if len(sess.get_df()) > 1:
                             self.sessions.append(sess)
                             curr_fiveple = [curr_fiveple[0], curr_fiveple[2],
                                                          curr_fiveple[4], curr_fiveple[1], curr_fiveple[3]]
@@ -63,10 +64,6 @@ class Interaction(PacketContainer):
         for sess in self.sessions:
             values.append([sess.srcIp, sess.srcPort, sess.dstIp, sess.dstPort])
 
-        return values
-
-    def getSample(self):
-        return self.pcap_df
         return values
 
     def get_session(self, sess_key):
