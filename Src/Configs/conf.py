@@ -24,7 +24,7 @@ videolike = {
 
 
 """path to dataset"""
-dataset_path = '/home/cyberlab/Desktop/dataset'
+dataset_path = '/home/ehud/Desktop/dataset'
 # ------------------------------------------------------------------------------------------------------------------
 
 

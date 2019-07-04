@@ -1,6 +1,5 @@
 from containers.PacketContainer import PacketContainer
 from containers.Session import Session
-
 import datetime
 import pandas as pd
 """
@@ -14,9 +13,8 @@ Class Streamer
 """
 
 
-class Streamer(PacketContainer):
+class Streamer():
     def __init__(self, interaction, delta_s, delta_t, threshold_p):
-        super(Streamer, self).__init__(interaction.pcap_df)
         self.interaction = interaction
         self.delta_s = delta_s
         self.delta_t = delta_t
@@ -94,6 +92,7 @@ class Streamer(PacketContainer):
                     print('close connection time', sess.to_filter())
                     self.video_related_sessions.append(sess)
 
-    def getSample(self):
+    """returns list of video related data frames"""
+    def get_dfs(self):
         return self.video_related_sessions
 

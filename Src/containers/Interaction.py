@@ -1,6 +1,8 @@
 import pandas as pd
 from containers.Session import *
 from containers.PacketContainer import PacketContainer
+import time
+
 """
 Class Interaction
     defines interaction between client and the internet,
@@ -34,28 +36,30 @@ class Interaction(PacketContainer):
     def get_sessions(self):
         curr_fiveple = None
         if len(self.sessions) == 0:
-            sessions_list = []
-            for index, row in self.df.iterrows():
-                if row['udp.dstport'] > 0 and row['udp.dstport'] == 443:
-                    curr_fiveple = ['UDP', row['ip.src'], row['udp.srcport'], row['ip.dst'], row['udp.dstport']]
+            unique_tcps = (self.df[(self.df['tcp.dstport'] == 443) & (self.df['ip.src'] == self.get_client_ip())]
+            .groupby(['ip.src','tcp.srcport','ip.dst','tcp.dstport']))
 
-                elif row['tcp.dstport'] > 0 and row['tcp.dstport'] == 443:
-                    curr_fiveple = ['TCP', row['ip.src'], row['tcp.srcport'], row['ip.dst'], row['tcp.dstport']]
+            unique_udps = (self.df[(self.df['udp.dstport'] == 443) & (self.df['ip.src'] == self.get_client_ip())]
+            .groupby(['ip.src', 'udp.srcport', 'ip.dst', 'udp.dstport']))
 
-                if curr_fiveple and curr_fiveple not in sessions_list:
-                        sessions_list.append(curr_fiveple)
-                        sess = Session(curr_fiveple[0], curr_fiveple[2],
-                                       curr_fiveple[4], curr_fiveple[1], curr_fiveple[3], self.df)
-                        if len(sess.get_df()) > 1:
-                            self.sessions.append(sess)
-                            curr_fiveple = [curr_fiveple[0], curr_fiveple[2],
-                                                         curr_fiveple[4], curr_fiveple[1], curr_fiveple[3]]
-                            sess_key = ''.join(str(x) + ' ' for x in curr_fiveple)
-                            self.sess_dict[sess_key] = sess
-                            curr_fiveple.clear()
-                        else:
-                            pass
+            for sess in unique_tcps.groups.keys():
 
+                new_session = Session('TCP', sess[0], sess[1],
+                                       sess[2], sess[3], self.df)
+                key = ['TCP', sess[0], sess[1],
+                       sess[2], sess[3]]
+                self.sessions.append(new_session)
+                self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
+
+            for sess in unique_udps.groups.keys():
+
+                new_session = Session('UDP', sess[0], sess[1],
+                                       sess[2], sess[3], self.df)
+                key = ['UDP', sess[0], sess[1],
+                       sess[2], sess[3]]
+                self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
+                self.sessions.append(new_session)
+        print(self.sess_dict.keys())
         return self.sessions
 
     def get_session_values(self):
@@ -78,13 +82,13 @@ class Interaction(PacketContainer):
     def get_session_string(self, row):
         if row['ip.src'] == self.get_client_ip():
             if row['tcp.srcport'] > 0:
-                curr_fiveple = ['TCP', row['tcp.srcport'], row['tcp.dstport'], row['ip.src'], row['ip.dst']]
+                curr_fiveple = ['TCP', row['ip.src'], row['tcp.srcport'], row['ip.dst'], row['tcp.dstport']]
             else:
-                curr_fiveple = ['UDP', row['udp.srcport'], row['udp.dstport'], row['ip.src'], row['ip.dst']]
+                curr_fiveple = ['UDP', row['ip.src'], row['udp.srcport'], row['ip.dst'], row['udp.dstport']]
 
         elif row['tcp.srcport'] > 0:
-            curr_fiveple = ['TCP', row['tcp.dstport'], row['tcp.srcport'], row['ip.dst'], row['ip.src']]
+            curr_fiveple = ['TCP', row['ip.dst'], row['tcp.dstport'], row['ip.src'], row['tcp.srcport']]
         else:
-            curr_fiveple = ['UDP', row['udp.dstport'], row['udp.srcport'], row['ip.dst'],  row['ip.src']]
+            curr_fiveple = ['UDP', row['ip.dst'], row['udp.dstport'], row['ip.src'], row['udp.srcport']]
 
         return ''.join(str(x) + ' ' for x in curr_fiveple)

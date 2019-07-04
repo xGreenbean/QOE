@@ -44,7 +44,8 @@ class Breaker(object):
 
         return acts
 
-    def getSample(self):
+    """returns list of data frames, each data frame is an act"""
+    def get_dfs(self):
         return self.sess_break()
 
     def split(self, bin_size):
