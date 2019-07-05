@@ -1,9 +1,9 @@
 import pandas as pd
 import datetime
-
+from configs import conf
 class Peaker(object):
     """delta_t is time in seconds, to group the dataframe by"""
-    def __init__(self, df, delta_t):
+    def __init__(self, df, delta_t=conf.delta_t):
         self.delta_t = delta_t
         self.df = df
 
@@ -29,3 +29,17 @@ class Peaker(object):
             peaks.append(pd.concat(peak))
 
         return peaks
+
+    def get_bins(self, bin_size):
+        peaks = self.sess_break()
+        bins_list = []
+        df = []
+        if len(peaks) < bin_size:
+            bins_list.append(peaks)
+            return bins_list
+        for i in range(len(peaks) - bin_size + 1):
+            for j in range(bin_size):
+                df.append(peaks[i + j])
+            bins_list.append(df)
+            df = []
+        return bins_list

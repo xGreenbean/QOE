@@ -29,18 +29,15 @@ videolike = {
 """path to dataset"""
 dataset_path = '/home/ehud/Desktop/dataset'
 # ------------------------------------------------------------------------------------------------------------------
-
-
-
+"""Breaker settings"""
+delta_t = 0.1
+threshold_t = 400
 
 # ---------------------------------- Video/non and Application features for classification  -------------------------
 
 """app_vid - Feature lists to build the vector for video / no video and 
    application by session(size histogram and extension misses),
    ##### These only for TCP session. For udp All tcp&ssl features from flow up need to be gone.  """
-app_top = ["max_peak", "min_peak", "std_peak", "mean_peak", "max_silence_time", "min_silence_time",
-                        "mean_silence_time", "std_silence_time", "peaks_count",
-                        "max_peak_length", "min_peak_length", "std_peak_length", "mean_peak_length", "first_peak"]
 
 app_agg = ["max_element_size", "min_element_size", "mean_element_size", "std_element_size","max_silence_time",
            "min_silence_time","mean_silence_time", "std_silence_time", "element_count", "max_element_length",
@@ -60,16 +57,32 @@ app_flowdown = ["packet_count", "min_packet_size", "max_packet_size",
                               "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
                               "min_time_delta", "mean_time_delta"]
 
-act_top = ["max_response_request", "min_response_request", "std_response_request",
-                                                 "mean_response_request", "max_response_request",
-                                                 "min_response_request_delta_time", "max_response_request_delta_time",
-                                                 "std_response_request_delta_time", "mean_response_request_delta_time",
-                                                "max_request_response_length","min_request_response_length",
-                                                "mean_request_response_length", "std_request_response_length",
-                                 "request_response_count"]
-
-first_peak = ["packets_size", "packet_count", "min_packet_size", "max_packet_size",
-                            "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
-                            "min_time_delta", "mean_time_delta"]
-
 # ------------------------------------------------------------------------------------------------------------------
+#Headers..
+header_peak = ["p_max_element_size", "p_min_element_size", "p_mean_element_size",
+                 "p_std_element_size","p_max_silence_time",
+           "p_min_silence_time","p_mean_silence_time", "p_std_silence_time",
+                 "p_element_count", "p_max_element_length",
+           "p_min_element_length", "p_std_element_length", "p_mean_element_length"]
+
+header_break = ["b_max_element_size", "b_min_element_size", "b_mean_element_size",
+                 "b_std_element_size","b_max_silence_time",
+           "b_min_silence_time","b_mean_silence_time", "b_std_silence_time",
+                 "b_element_count", "b_max_element_length",
+           "b_min_element_length", "b_std_element_length", "b_mean_element_length"]
+
+header_sess = ["s_packet_count", "s_min_packet_size", "s_max_packet_size",
+                            "s_mean_packet_size", "s_std_packet_size",
+              "s_size_var", "s_max_time_delta", "s_std_time_delta",
+                            "s_min_time_delta", "s_mean_time_delta"]
+
+header_down = ["upstream_cipher_suites", "upstream_ssl_v", "upstream_ssl_session_id_len",
+                            "upstream_ssl_num_compression_methods", "u_packet_count", "u_min_packet_size",
+                            "u_max_packet_size", "u_mean_packet_size", "u_std_packet_size", "u_size_var", "syn_tcp_scale",
+                            "syn_mss", "syn_tcp_win_size", "u_max_time_delta", "u_std_time_delta", "u_min_time_delta",
+                            "u_mean_time_delta", "upstream_mean_ttl", "upstream_num_keep_alive"]
+
+header_up = ["d_packet_count", "d_min_packet_size", "d_max_packet_size",
+                              "d_mean_packet_size", "d_std_packet_size", "d_size_var", "d_max_time_delta",
+               "d_std_time_delta",
+                              "d_min_time_delta", "d_mean_time_delta"]

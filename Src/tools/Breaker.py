@@ -1,6 +1,6 @@
 from containers.Session import *
 import pandas as pd
-
+from configs import conf
 """
 Class Breaker
     Breaks a session into Request and Response pieces,
@@ -9,7 +9,7 @@ Class Breaker
 """
 
 class Breaker(object):
-    def __init__(self, session, delta_t, threshold_t):
+    def __init__(self, session, delta_t=conf.delta_t, threshold_t=conf.threshold_t):
         """pandas data frame, represents a session"""
         self.session = session
         """threshold_t, represents GET minimum request size"""
@@ -45,16 +45,16 @@ class Breaker(object):
     def get_dfs(self):
         return self.sess_break()
 
-    def split(self, bin_size):
-        request_response = self.sess_break()
+    def get_bins(self, bin_size):
+        acts = self.sess_break()
         bins_list = []
         df = []
-        if len(request_response) < bin_size:
-            bins_list.append(request_response)
+        if len(acts) < bin_size:
+            bins_list.append(acts)
             return bins_list
-        for i in range(len(request_response) - bin_size + 1):
+        for i in range(len(acts) - bin_size + 1):
             for j in range(bin_size):
-                df.append(request_response[i + j])
+                df.append(acts[i + j])
             bins_list.append(df)
             df = []
         return bins_list
