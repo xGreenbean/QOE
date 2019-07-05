@@ -95,3 +95,11 @@ class Session(PacketContainer):
         else:
             return ('ip.addr==%s && udp.port==%d && ip.addr==%s && udp.port==%d'
                 %(self.srcIp, self.srcPort, self.dstIp, self.dstPort))
+
+    def get_label(self,label_dict):
+        for key, values in label_dict.items():
+            for value in values:
+                if value in self.get_sni():
+                    return key
+            return 'unknown'
+

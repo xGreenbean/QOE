@@ -8,16 +8,19 @@ application_sni = {
     "FaceBook": ["fbcdn", "graph"],
     "YouTube": ["googlevideo"],
     "Instagram": ["cdnistagram"],
-    "OtherOTT": ["video.twimg.com", "cnnios-f.akamaihd.net"]
+    "OtherOTT": ["video.twimg.com", "cnnios-f.akamaihd.net"],
+    "unknown":[]
 }
 
 video = {
-    "video": ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"]
+    "video": ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"],
+    "unknown":[]
 }
 
 videolike = {
     "video": ["nflxvideo", "fbcdn", "googlevideo","cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"],
-    "video_like": []
+    "video_like": [],
+    "unknown":[]
 }
 
 
@@ -39,7 +42,9 @@ app_top = ["max_peak", "min_peak", "std_peak", "mean_peak", "max_silence_time", 
                         "mean_silence_time", "std_silence_time", "peaks_count",
                         "max_peak_length", "min_peak_length", "std_peak_length", "mean_peak_length", "first_peak"]
 
-app_agg = ["max_element_size", "min_element_size", "mean_element_size", "std_element_size", ]
+app_agg = ["max_element_size", "min_element_size", "mean_element_size", "std_element_size","max_silence_time",
+           "min_silence_time","mean_silence_time", "std_silence_time", "element_count", "max_element_length",
+           "min_element_length", "std_element_length", "mean_element_length"]
 
 app_sess = ["packet_count", "min_packet_size", "max_packet_size",
                             "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",

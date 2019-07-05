@@ -22,14 +22,12 @@ class Breaker(object):
         acts = []
         request_start_time = 0
         act = []
-        for index, row in self.session.all_packets.iterrows():
-
+        for index, row in self.session.df.iterrows():
             """check for clients packets requests"""
             if row['ip.src'] == self.session.srcIp and row['frame.len'] > self.threshold_t and\
                     (request_start_time == 0 or row['frame.time_epoch'] - request_start_time > self.delta_t):
-
                 if act:
-                    acts.append(pd.DataFrame(self.session.all_packets.loc[act]))
+                    acts.append(pd.DataFrame(self.session.df.loc[act]))
                     act.clear()
 
                 request_start_time = row['frame.time_epoch']
@@ -40,8 +38,7 @@ class Breaker(object):
                     act.append(index)
 
         if act:
-            acts.append(pd.DataFrame(self.session.all_packets.loc[act]))
-
+            acts.append(pd.DataFrame(self.session.df.loc[act]))
         return acts
 
     """returns list of data frames, each data frame is an act"""
