@@ -36,12 +36,16 @@ class Interaction(PacketContainer):
     def get_sessions(self):
         curr_fiveple = None
         if len(self.sessions) == 0:
+
+            #group by tcp 4ple
             unique_tcps = (self.df[(self.df['tcp.dstport'] == 443) & (self.df['ip.src'] == self.get_client_ip())]
             .groupby(['ip.src','tcp.srcport','ip.dst','tcp.dstport']))
 
+            #group by udp 4ple
             unique_udps = (self.df[(self.df['udp.dstport'] == 443) & (self.df['ip.src'] == self.get_client_ip())]
             .groupby(['ip.src', 'udp.srcport', 'ip.dst', 'udp.dstport']))
 
+            #add tcpc sessions
             for sess in unique_tcps.groups.keys():
 
                 new_session = Session('TCP', sess[0], sess[1],
@@ -49,6 +53,7 @@ class Interaction(PacketContainer):
                 key = ['TCP', sess[0], sess[1],
                        sess[2], sess[3]]
                 self.sessions.append(new_session)
+                #add sessions to Interactions dictionry
                 self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
 
             for sess in unique_udps.groups.keys():
@@ -62,6 +67,7 @@ class Interaction(PacketContainer):
         print(self.sess_dict.keys())
         return self.sessions
 
+    """returns sessions values"""
     def get_session_values(self):
         self.get_sessions()
         values = []
@@ -70,6 +76,7 @@ class Interaction(PacketContainer):
 
         return values
 
+    """returns a sessions coressponding to a session key"""
     def get_session(self, sess_key):
         if self.sess_dict[sess_key]:
             return self.sess_dict[sess_key]

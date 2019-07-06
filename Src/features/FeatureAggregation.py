@@ -1,7 +1,12 @@
 # static variable
 skip_first = False
 import numpy as np
-
+"""
+Class FeatureAggregation:
+Preforms feature caculation on lists of dataframes.
+Class fields:
+df_list - list of data frames.
+"""
 """
 Peak features:
        peak mean
@@ -30,20 +35,20 @@ Request Response features:
 
 class FeatureAggregation:
     def __init__(self, df_array):
-        self.df_array = df_array
+        self.df_list = df_array
 
-        self.sizes = np.zeros(len(self.df_array))
-        for index, df in enumerate(self.df_array):
+        self.sizes = np.zeros(len(self.df_list))
+        for index, df in enumerate(self.df_list):
             self.sizes[index] = df['frame.len'].sum()
 
-        self.silences = np.zeros(len(self.df_array))
-        for i in range(len(self.df_array) - 1):
-            max_t = self.df_array[i]['frame.time_epoch'].max()
-            min_t = self.df_array[i + 1]['frame.time_epoch'].min()
+        self.silences = np.zeros(len(self.df_list))
+        for i in range(len(self.df_list) - 1):
+            max_t = self.df_list[i]['frame.time_epoch'].max()
+            min_t = self.df_list[i + 1]['frame.time_epoch'].min()
             self.silences[i] = (min_t - max_t)
 
-        self.lens = np.zeros(len(self.df_array))
-        for index, df in enumerate(self.df_array):
+        self.lens = np.zeros(len(self.df_list))
+        for index, df in enumerate(self.df_list):
             self.lens[index] = len(df)
 
     def apply(self, feature_list):
@@ -117,4 +122,4 @@ class FeatureAggregation:
         return self.lens.std()
 
     def element_count(self):
-        return len(self.df_array)
+        return len(self.df_list)

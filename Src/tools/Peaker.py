@@ -1,6 +1,10 @@
 import pandas as pd
 import datetime
 from configs import conf
+"""
+Class Peaker
+    Breaks a dataframe into peak pieces
+"""
 class Peaker(object):
     """delta_t is time in seconds, to group the dataframe by"""
     def __init__(self, df, delta_t=conf.delta_t):
@@ -31,7 +35,7 @@ class Peaker(object):
         return peaks
 
     def get_bins(self, bin_size):
-        peaks = self.sess_break()
+        peaks = self.get_dfs()
         bins_list = []
         df = []
         if len(peaks) < bin_size:

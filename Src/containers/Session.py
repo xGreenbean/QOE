@@ -88,6 +88,7 @@ class Session(PacketContainer):
     def to_string(self):
         return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]
 
+    """returns a string representing the wireshark filter of the session."""
     def to_filter(self):
         if self.protocol == 'TCP':
             return ('ip.addr==%s && tcp.port==%d && ip.addr==%s && tcp.port==%d'
@@ -96,6 +97,9 @@ class Session(PacketContainer):
             return ('ip.addr==%s && udp.port==%d && ip.addr==%s && udp.port==%d'
                 %(self.srcIp, self.srcPort, self.dstIp, self.dstPort))
 
+    """input: a dictionary, where key is is the label,
+        and sni values for it.
+        output: a label coresspoding to the sessions sni, based on input dict"""
     def get_label(self,label_dict):
         for key, values in label_dict.items():
             for value in values:

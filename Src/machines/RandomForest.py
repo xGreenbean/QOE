@@ -1,7 +1,11 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+
 from configs import conf
 """
 Random Forest regression algorithm each row of feature based on full session,flow up and down
@@ -10,50 +14,90 @@ Need upgrade this in this section
 """
 
 
-def run_rfr(test_size, num_trees, rs_test_train, rs_regressor):
-    # Read in data and display first 5 rows
-    feature_type = 'video_like_req_res_features'
-    features = draw_features(feature_type)
-    print(len(features[features['Label'] == 1]), 'FaceBook')
-    print(len(features[features['Label'] == 2]), 'Netflix')
-    print(len(features[features['Label'] == 3]), 'YouTube')
-    print(len(features[features['Label'] == 4]), 'Instagram')
-    print(len(features[features['Label'] == 5]), 'OtherOTT')
-    print(len(features[features['Label'] == 6]), 'Unknown')
-
+def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor):
 
     #   only for video/no video, for app remove
-
     # One-hot encode the data using pandas get_dummies
+    features = pd.read_csv('/home/ehud/Desktop/QOE/Src/generators/bins.csv')
+
+    print("video ",(features['label'] == 'video').sum(),"unknown ",
+          (features['label'] != 'video').sum())
+
+    features = features.drop(['sni','filter','source_file', 'Unnamed: 0'], axis=1)
     features = features.sample(frac=1)
     features = pd.get_dummies(features)
-
     # Labels are the values we want to predict
-    labels = np.array(features['Label'])
+
+    labels = np.array(features[['label_unknown','label_video']])
     # Remove the labels from the features
     # axis 1 refers to the columns
-    features = features.drop('Label', axis=1)
     # Convert to numpy array
+    features = features.drop(['label_unknown','label_video'], axis=1)
+    cols = features.columns
     features = np.array(features)
+
     # Split the data into training and testing sets
     train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=test_size,
                                                                                 random_state=rs_test_train)
-    # Instantiate model with 1000 decision trees
-    # 0.2 1493 52 47 = 98.75
-    # 0.3 1233 42 49 98.13
-    rf = RandomForestRegressor(n_estimators=num_trees, random_state=rs_regressor)
+    rf = RandomForestClassifier(n_estimators=num_trees, random_state=rs_regressor)
+
     # Train the model on training data
     rf.fit(train_features, train_labels)
     predictions = rf.predict(test_features)
     # Calculate the absolute errors
     errors = abs(predictions - test_labels)
-    # Print out the mean absolute error (mae)
-    print('Mean Absolute Error:', round(np.mean(errors), 2), 'degrees.')
-    mape = 100 * (errors / test_labels)
-    # Calculate and display accuracy
-    accuracy = 100 - np.mean(mape)
-    print('Accuracy:', round(accuracy, 2), '%.')
 
+    print("Train Accuracy:", metrics.accuracy_score(train_labels, rf.predict(train_features)))
+    print("Accuracy:", metrics.accuracy_score(predictions, test_labels))
+    print(" Confusion matrix\n", confusion_matrix(test_labels.argmax(axis=1), predictions.argmax(axis=1)))
 
+    feature_importances = pd.DataFrame(rf.feature_importances_,
+                                       index=cols,
+                                       columns=['importance']).sort_values('importance', ascending=False)
+    print(feature_importances)
+
+def run_rfr_app(test_size, num_trees, rs_test_train, rs_regressor):
+
+    #   only for video/no video, for app remove
+    # One-hot encode the data using pandas get_dummies
+    features = pd.read_csv('/home/ehud/Desktop/QOE/Src/generators/bins.csv')
+
+    print(df.groupby('label').count()
+)
+
+    features = features.drop(['sni','filter','source_file', 'Unnamed: 0'], axis=1)
+    features = features.sample(frac=1)
+    features = pd.get_dummies(features)
+    # Labels are the values we want to predict
+
+    labels = np.array(features[['label_unknown','label_Netflix', 'label_FaceBook',
+                                'label_YouTube', 'label_Instagram', 'label_OtherOTT']])
+    # Remove the labels from the features
+    # axis 1 refers to the columns
+    # Convert to numpy array
+    features = features.drop(['label_unknown','label_Netflix', 'label_FaceBook',
+                                'label_YouTube', 'label_Instagram', 'label_OtherOTT'], axis=1)
+    cols = features.columns
+    features = np.array(features)
+
+    # Split the data into training and testing sets
+    train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=test_size,
+                                                                                random_state=rs_test_train)
+    rf = RandomForestClassifier(n_estimators=num_trees, random_state=rs_regressor)
+
+    # Train the model on training data
+    rf.fit(train_features, train_labels)
+    predictions = rf.predict(test_features)
+    # Calculate the absolute errors
+    errors = abs(predictions - test_labels)
+
+    print("Train Accuracy:", metrics.accuracy_score(train_labels, rf.predict(train_features)))
+    print("Accuracy:", metrics.accuracy_score(predictions, test_labels))
+    print(" Confusion matrix\n", confusion_matrix(test_labels.argmax(axis=1), predictions.argmax(axis=1)))
+
+    feature_importances = pd.DataFrame(rf.feature_importances_,
+                                       index=cols,
+                                       columns=['importance']).sort_values('importance', ascending=False)
+    print(feature_importances)
 if __name__ == '__main__':
-    run_rfr(0.25, 1256, 41, 42)
+    run_rfr_video(0.30, 1256, 41, 42)

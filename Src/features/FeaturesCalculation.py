@@ -5,8 +5,10 @@ FIX:
 """
 
 """
+Class FeatureCaculation:
+Preforms feature caculation on a dataframe
 Class fields:
-sess - Session DataFrame
+df - data frame
 """
 
 
@@ -55,7 +57,7 @@ class FeaturesCalculation:
     """ Variance of packet size """
     def size_var(self):
         fu_fd_df = self.df
-        if len(fu_fd_df) < 2:
+        if len(self.df) == 0:
             return 0
         return fu_fd_df['frame.len'].var()
 
@@ -119,7 +121,7 @@ class FeaturesCalculation:
 
     """ Std packet size """
     def std_packet_size(self):
-        if len(self.df) < 2:
+        if len(self.df) == 0:
             return 0
         return self.df['frame.len'].std()
 

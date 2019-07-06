@@ -50,7 +50,7 @@ class DataFactory:
                     os.remove(os.path.join(dirName, fname))
 
     @staticmethod
-    def sessions_to_csv(label_dict=conf.video, peaker=False, breaker=False):
+    def sessions_to_csv(label_dict=conf.video, peaker=False, breaker=False, path='test.csv'):
         dict_list = []
         for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
             for fname in fileList:
@@ -63,12 +63,11 @@ class DataFactory:
                         dict = {}
                         dict.update([('filter', sess.to_filter()),('source_file', fname),
                                      ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
-                        up = sess.get_flows()[0]
-                        down = sess.get_flows()[1]
-                        dict.update(zip(conf.header_down, FeaturesCalculation(down)
+
+                        dict.update(zip(conf.header_down, FeaturesCalculation(sess.get_flows()[1])
                                           .apply(conf.app_flowdown)))
 
-                        dict.update(zip(conf.header_up, FeaturesCalculation(up)
+                        dict.update(zip(conf.header_up, FeaturesCalculation(sess.get_flows()[0])
                                         .apply(conf.app_flowup)))
 
                         dict.update(zip(conf.header_sess, FeaturesCalculation(sess.get_df())
@@ -87,8 +86,40 @@ class DataFactory:
                         dict_list.append(dict)
 
         df = pd.DataFrame(dict_list)
-        df.to_csv('test.csv')
+        df.to_csv(path)
 
     # @staticmethod
-    # def bins_to_csv():
-DataFactory.sessions_to_csv(peaker=True,breaker=True)
+    def bins_to_csv(label_dict=conf.video, peaker=False, breaker=False, bin_size=5):
+        dict_list = []
+        for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
+            for fname in fileList:
+                if fname.endswith('.csv'):
+
+                    df = pd.read_csv(os.path.join(dirName, fname))
+                    temp_interaction = Interaction(df)
+
+                    for sess in temp_interaction.get_sessions():
+
+                        if peaker:
+                            for bin in Peaker(sess.get_df()).get_bins(bin_size):
+                                dict = {}
+                                dict.update([('filter', sess.to_filter()), ('source_file', fname),
+                                             ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+                                dict.update(zip(conf.header_break,
+                                                FeatureAggregation(bin)
+                                                .apply(conf.app_agg)))
+                                dict_list.append(dict)
+
+                        if breaker:
+                            for bin in Breaker(sess).get_bins(bin_size):
+                                dict = {}
+                                dict.update([('filter', sess.to_filter()), ('source_file', fname),
+                                             ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+
+                                dict.update(zip(conf.header_break,
+                                                FeatureAggregation(bin)
+                                                .apply(conf.app_agg)))
+                                dict_list.append(dict)
+
+        df = pd.DataFrame(dict_list)
+        df.to_csv('bins.csv')
