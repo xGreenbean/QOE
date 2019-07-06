@@ -89,7 +89,7 @@ class DataFactory:
         df.to_csv(path)
 
     # @staticmethod
-    def bins_to_csv(label_dict=conf.video, peaker=False, breaker=False, bin_size=5):
+    def bins_to_csv(label_dict=conf.video, peaker=False, breaker=False, bin_size=5,path='test.csv'):
         dict_list = []
         for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
             for fname in fileList:
@@ -122,4 +122,4 @@ class DataFactory:
                                 dict_list.append(dict)
 
         df = pd.DataFrame(dict_list)
-        df.to_csv('bins.csv')
+        df.to_csv(path)
