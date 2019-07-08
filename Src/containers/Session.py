@@ -77,7 +77,7 @@ class Session(PacketContainer):
     def get_sni(self):
         flow_up_df = self.flow_up.get_df()
         if self.protocol == 'TCP':
-            sni_filter = "ssl.handshake.extensions_server_name"
+            sni_filter = "tls.handshake.extensions_server_name"
         else:
             sni_filter = "gquic.tag.sni"
         df = flow_up_df[flow_up_df[sni_filter].notnull()]
