@@ -1,5 +1,5 @@
 import pandas as pd
-
+import datetime
 """
  Class PacketContainer holds some data frame df.
 """
@@ -21,10 +21,12 @@ class PacketContainer(object):
     """
     def split(self, intervals):
         df = self.getSample()
-        df['frame.time'] = (df['frame.time']).str[:-17]
-        df['date'] = pd.to_datetime(df['frame.time'])
+        df = df.dropna(subset=['frame.time_epoch'])
+        df['date'] = df['frame.time_epoch'].apply(datetime.datetime.fromtimestamp)
         group_intervals = df.groupby(pd.Grouper(key='date', freq=(str(intervals) + 'S')))
         df_list = []
-        for df in group_intervals:
-            df_list.append(df[1])
+        counter = 0
+        for item in group_intervals:
+            df_list.append(item[1])
         return df_list
+

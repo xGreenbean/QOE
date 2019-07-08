@@ -1,18 +1,17 @@
 from Configs import conf
 import pandas as pd
+import os
 
-
-def draw_features():
+def draw_features(feature_type):
     frames = []
-    for device in conf.Devices:
-        for ott in conf.Otts:
-            if ott != "download" and device != "onePlus6":
-                for i in range(conf.numbers_of_id):
-                    df = pd.read_csv(
-                        "C:\\Users\\Saimon\\Desktop\\dataset\\" + device + "_" + ott + "\\Id_" + str(
-                            i + 1) + "\\" + device + "_" + ott + "_"+conf.feature_type+"request_response_features_" + str(
-                            i + 1) + ".csv")
-                    frames.append(df)
+    for dirName, subdirList, fileList in os.walk(conf.dataset_path):
+        for fname in fileList:
+            if fname.endswith('.csv') and (feature_type in fname):
+                df = pd.read_csv(os.path.join(dirName, fname))
+                frames.append(df)
+                if df.isnull().values.any():
+                    print(os.path.join(dirName, fname))
+
     print("Done Reading")
     result = pd.concat(frames)
     return result

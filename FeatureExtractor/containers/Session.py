@@ -1,6 +1,6 @@
 from containers.Flow import *
 from containers.PacketContainer import PacketContainer
-
+from Features.FeaturesCalculation import FeaturesCalculation
 """
 Class Session
     define session by 5-tuple: Protocol, ip,port source and destination
@@ -67,6 +67,10 @@ class Session(PacketContainer):
     def getSample(self):
         return self.all_packets
 
+    def get_session_size(self):
+        fc = FeaturesCalculation(self.all_packets)
+        return fc.packets_size()
+
     """
         Function return the sni for the session 
     """
@@ -74,10 +78,9 @@ class Session(PacketContainer):
     def get_sni(self):
         flow_up_df = self.flow_up.getSample()
         if self.protocol == 'TCP':
-            sni_filter = "tls.handshake.extensions_server_name"
+            sni_filter = "ssl.handshake.extensions_server_name"
         else:
             sni_filter = "gquic.tag.sni"
-            return "None"
         df = flow_up_df[flow_up_df[sni_filter].notnull()]
         if len(df) == 0:
             return "None"
@@ -85,3 +88,11 @@ class Session(PacketContainer):
 
     def to_print(self):
         return [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]
+
+    def to_filter(self):
+        if self.protocol == 'TCP':
+            return ('ip.addr==%s && tcp.port==%d && ip.addr==%s && tcp.port==%d'
+                %(self.srcIp, self.srcPort, self.dstIp, self.dstPort))
+        else:
+            return ('ip.addr==%s && udp.port==%d && ip.addr==%s && udp.port==%d'
+                %(self.srcIp, self.srcPort, self.dstIp, self.dstPort))
