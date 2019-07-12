@@ -18,8 +18,9 @@ def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor):
 
     #   only for video/no video, for app remove
     # One-hot encode the data using pandas get_dummies
-    features = pd.read_csv('/home/ehud/Desktop/QOE/Src/generators/bins.csv')
-
+    features = pd.read_csv('/home/ehud/Desktop/QOE/src/bins_breaker.csv')
+    for index,row in features.iterrows():
+        print(row)
     print("video ",(features['label'] == 'video').sum(),"unknown ",
           (features['label'] != 'video').sum())
 
@@ -48,7 +49,7 @@ def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor):
     errors = abs(predictions - test_labels)
 
     print("Train Accuracy:", metrics.accuracy_score(train_labels, rf.predict(train_features)))
-    print("Accuracy:", metrics.accuracy_score(predictions, test_labels))
+    print("Test Accuracy:", metrics.accuracy_score(predictions, test_labels))
     print(" Confusion matrix\n", confusion_matrix(test_labels.argmax(axis=1), predictions.argmax(axis=1)))
 
     feature_importances = pd.DataFrame(rf.feature_importances_,
@@ -60,10 +61,9 @@ def run_rfr_app(test_size, num_trees, rs_test_train, rs_regressor):
 
     #   only for video/no video, for app remove
     # One-hot encode the data using pandas get_dummies
-    features = pd.read_csv('/home/ehud/Desktop/QOE/Src/generators/bins.csv')
+    features = pd.read_csv('/home/ehud/Desktop/QOE/src/generators/bins.csv')
 
-    print(df.groupby('label').count()
-)
+    print(features.groupby('label').count())
 
     features = features.drop(['sni','filter','source_file', 'Unnamed: 0'], axis=1)
     features = features.sample(frac=1)

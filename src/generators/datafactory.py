@@ -21,7 +21,7 @@ class DataFactory:
     """creates the tshark's csv if dosent exists"""
     @staticmethod
     def make_csv():
-        for dirName, subdirList, fileList in os.walk(conf.dataset_path):
+        for dirName, subdirList, fileList in os.walk():
             for fname in fileList:
                 if fname.endswith('.pcap') and fname.replace('.pcap', '.csv') not in fileList:
                     os.system(tshark_pcap_to_csv.replace('[src]', os.path.join(dirName, fname))
@@ -37,7 +37,7 @@ class DataFactory:
 
     @staticmethod
     def rename_csv():
-        for dirName, subdirList, fileList in os.walk(conf.dataset_path):
+        for dirName, subdirList, fileList in os.walk('/home/ehud/Desktop/silhouette-trace'):
             for fname in fileList:
                 if fname.endswith('.csv') and not fname.startswith('raw'):
                     os.rename(os.path.join(dirName, fname), os.path.join(dirName, 'raw_' + fname))
@@ -102,24 +102,31 @@ class DataFactory:
 
                         if peaker:
                             for bin in Peaker(sess.get_df()).get_bins(bin_size):
-                                dict = {}
-                                dict.update([('filter', sess.to_filter()), ('source_file', fname),
-                                             ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
-                                dict.update(zip(conf.header_break,
-                                                FeatureAggregation(bin)
-                                                .apply(conf.app_agg)))
-                                dict_list.append(dict)
+                                if len(bin) != 0:
+                                    dict = {}
+                                    dict.update([('filter', sess.to_filter()), ('source_file', fname),
+                                                 ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+                                    dict.update(zip(conf.header_break,
+                                                    FeatureAggregation(bin)
+                                                    .apply(conf.app_agg)))
+                                    dict.update(zip(conf.header_first,
+                                                    FeaturesCalculation(bin[0])
+                                                    .apply(conf.app_sess)))
+                                    dict_list.append(dict)
 
                         if breaker:
                             for bin in Breaker(sess).get_bins(bin_size):
-                                dict = {}
-                                dict.update([('filter', sess.to_filter()), ('source_file', fname),
-                                             ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
-
-                                dict.update(zip(conf.header_break,
-                                                FeatureAggregation(bin)
-                                                .apply(conf.app_agg)))
-                                dict_list.append(dict)
+                                if len(bin) != 0:
+                                    dict = {}
+                                    dict.update([('filter', sess.to_filter()), ('source_file', fname),
+                                                 ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+                                    dict.update(zip(conf.header_break,
+                                                    FeatureAggregation(bin)
+                                                    .apply(conf.app_agg)))
+                                    dict.update(zip(conf.header_first,
+                                                    FeaturesCalculation(bin[0])
+                                                    .apply(conf.app_sess)))
+                                    dict_list.append(dict)
 
         df = pd.DataFrame(dict_list)
         df.to_csv(path)
