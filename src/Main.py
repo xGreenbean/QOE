@@ -7,8 +7,8 @@ from generators.datafactory import *
 from tools.Breaker import *
 from tools.Peaker import *
 if __name__ == '__main__':
-    # DataFactory.sessions_to_csv(breaker=True,path='sess_breaker.csv')
+
+    DataFactory.sessions_to_csv(breaker=True,path='sess_breaker.csv')
     # DataFactory.sessions_to_csv(peaker=True,path='sess_peaker')
     #DataFactory.make_csv()
-    DataFactory.bins_to_csv(breaker=True,path='bins_breaker.csv')
     #DataFactory.bins_to_csv(peaker=True,path='bin_speaker.csv')
