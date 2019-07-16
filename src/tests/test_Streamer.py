@@ -18,7 +18,7 @@ for dirName, subdirList, fileList in os.walk('/home/ehud/Desktop/silhouette-trac
     for fname in fileList:
         if fname.startswith('raw') and fname.endswith('.csv'):
             interaction_curr = Interaction(pd.read_csv(os.path.join(dirName, fname)))
-            streamer_curr = Streamer(interaction_curr, 5, 0.1, 250000)
+            streamer_curr = Streamer(interaction_curr, 5, 0.01, 250000)
             video_sessions = streamer_curr.get_video_related_sessions()
             not_video_sessions = streamer_curr.get_not_video_related_sessions()
 
