@@ -34,7 +34,7 @@ QoE/.idea/
 
 # C extensions
 *.so
-
+venv/
 # Distribution / packaging
 .Python
 env/
