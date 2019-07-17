@@ -1,5 +1,0 @@
-tshark -r oneplus_test.pcap -T fields -e gquic.tag.sni -Y gquic.tag.sni -e ip.src -e udp.srcport -e ip.dst -e udp.dstport -E header=y -E separator=, -E occurrence=f > SNI.csv
-tshark -r oneplus_test.pcap -T fields -e ssl.handshake.extensions_server_name -Y ssl.handshake.extensions_server_name  -e ip.src -e tcp.srcport -e ip.dst -e tcp.dstport -E separator=, -E occurrence=f >> SNI.csv
-
-
-
