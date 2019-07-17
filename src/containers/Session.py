@@ -17,7 +17,7 @@ class Session(PacketContainer):
         self.dstIp = dst_ip
         self.dstPort = dst_port
         self.protocol = protocol
-
+        self.streamer_type = 'tobedefined'
         if protocol == "TCP":
             self.df = self.get_all_tcps(df)
         elif protocol == "UDP":
@@ -107,3 +107,24 @@ class Session(PacketContainer):
                     return key
             return 'unknown'
 
+    def get_avg_pkt(self):
+        return self.df['frame.len'].mean()
+
+    def get_duration(self):
+        return self.df['frame.time_epoch'].max() - self.df['frame.time_epoch'].min()
+
+    def get_volume(self):
+        return self.df['frame.len'].sum()
+
+    def get_rate(self):
+        return self.get_volume()/self.get_duration()
+
+    def get_type(self):
+        return self.streamer_type
+
+    def get_protocol(self):
+        return self.protocol
+
+    def get_string(self):
+        curr_fiveple = [self.protocol, self.srcIp, self.srcPort, self.dstIp, self.dstPort]
+        return ''.join(str(x) + ' ' for x in curr_fiveple)

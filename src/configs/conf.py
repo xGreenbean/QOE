@@ -59,6 +59,10 @@ app_flowdown = ["packet_count", "min_packet_size", "max_packet_size",
 
 # ------------------------------------------------------------------------------------------------------------------
 #Headers..
+header_first = ["f_packet_count", "f_min_packet_size", "f_max_packet_size",
+                            "f_mean_packet_size", "f_std_packet_size", "f_size_var", "f_max_time_delta", "f_std_time_delta",
+                            "f_min_time_delta", "f_mean_time_delta"]
+
 header_peak = ["p_max_element_size", "p_min_element_size", "p_mean_element_size",
                  "p_std_element_size","p_max_silence_time",
            "p_min_silence_time","p_mean_silence_time", "p_std_silence_time",
@@ -86,3 +90,4 @@ header_up = ["d_packet_count", "d_min_packet_size", "d_max_packet_size",
                               "d_mean_packet_size", "d_std_packet_size", "d_size_var", "d_max_time_delta",
                "d_std_time_delta",
                               "d_min_time_delta", "d_mean_time_delta"]
+header_streamer = ["sni", "verdict", "enc", "duration", "vol", "rate", "avg pkt len", "type", 'tcp/udp']

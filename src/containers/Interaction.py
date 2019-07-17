@@ -80,7 +80,6 @@ class Interaction(PacketContainer):
     def get_session(self, sess_key):
         if self.sess_dict[sess_key]:
             return self.sess_dict[sess_key]
-        raise ValueError('session not found at get session', sess_key)
 
     """
     input: data frame row
