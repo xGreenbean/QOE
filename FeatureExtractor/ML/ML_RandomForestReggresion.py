@@ -13,7 +13,7 @@ Need upgrade this in this section
 
 def run_rfr(test_size, num_trees, rs_test_train, rs_regressor):
     # Read in data and display first 5 rows
-    feature_type = 'video_like_req_res_features'
+    feature_type = 'video_rr_session_features'
     features = draw_features(feature_type)
     print(len(features[features['Label'] == 1]), 'FaceBook')
     print(len(features[features['Label'] == 2]), 'Netflix')
@@ -57,4 +57,4 @@ def run_rfr(test_size, num_trees, rs_test_train, rs_regressor):
 
 
 if __name__ == '__main__':
-    run_rfr(0.25, 1256, 41, 42)
+    run_rfr(0.25, 1493, 41, 42)

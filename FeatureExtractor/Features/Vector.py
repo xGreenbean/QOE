@@ -20,15 +20,16 @@ class Vector:
         array_df = self.pc.split(bin_size)
         all_results = []
         for bin_df in array_df:
-            fc = TopFeatures(bin_df)
-            bin_result = []
-            for feature in ft_l:
-                method = getattr(fc, feature)
-                if feature == "first_peak":
-                    bin_result.extend(method())
-                else:
-                    bin_result.append(method())
-            all_results.append(list(bin_result))
+            if not bin_df.empty:
+                fc = TopFeatures(bin_df)
+                bin_result = []
+                for feature in ft_l:
+                    method = getattr(fc, feature)
+                    if feature == "first_peak":
+                        bin_result.extend(method())
+                    else:
+                        bin_result.append(method())
+                all_results.append(list(bin_result))
         return all_results
 
     def get_vector_by_streamer(self):

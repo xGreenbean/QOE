@@ -7,16 +7,16 @@ application_sni = {
     "Netflix": ["nflxvideo"],
     "FaceBook": ["fbcdn", "graph"],
     "YouTube": ["googlevideo"],
-    "Instagram": ["cdnistagram"],
+    "Instagram": ["cdninstagram"],
     "OtherOTT": ["video.twimg.com", "cnnios-f.akamaihd.net"]
 }
 
 video_no_video_sni = {
-    "video": ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"]
+    "video": ["nflxvideo", "fbcdn", "googlevideo", "cdninstagram", "cnnios-f.akamaihd.net", "video.twimg.com"]
 }
 
 video_videoLike_noVideo = {
-    "video": ["nflxvideo", "fbcdn", "googlevideo","cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"],
+    "video": ["nflxvideo", "fbcdn", "googlevideo","cdninstagram", "cnnios-f.akamaihd.net", "video.twimg.com"],
     "video_like": []
 }
 
@@ -24,7 +24,7 @@ video_videoLike_noVideo = {
 
 
 """path to dataset"""
-dataset_path = '/home/cyberlab/Desktop/dataset'
+dataset_path = '/home/cyberlab/Desktop/dataset/'
 # ------------------------------------------------------------------------------------------------------------------
 
 

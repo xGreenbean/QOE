@@ -13,7 +13,6 @@ class SampleFactory:
         vector_session = Vector(session)
         vector_flow_up = Vector(session.flow_up)
         vector_flow_down = Vector(session.flow_down)
-        # -- Session
         vec_session = vector_session.get_vector_feature(conf.app_vid_session_features)
         # -- Flow up
         vec_flow_up_top = vector_flow_up.get_vector_feature_by_interval(interval, conf.app_vid_top_features, is_skip,

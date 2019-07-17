@@ -1,7 +1,7 @@
 import os
 import shutil
 from Generators.SniGenerator import *
-from Features.SampleFactory import  *
+from Features.SampleFactory import *
 
 global tshark_pcap_to_csv
 tshark_pcap_to_csv = 'tshark -r [src] -T fields -e frame.number -e frame.time -e frame.len -e ip.src -e ip.dst -e ip.proto -e tcp.srcport -e tcp.dstport -e udp.srcport -e udp.dstport -e ssl.handshake.session_id_length -e ssl.handshake.comp_methods_length -e ssl.handshake.extension.len -e ssl.handshake.cipher_suites_length -e tcp.window_size -e tcp.options.wscale.shift -e tcp.analysis.keep_alive -e tcp.options.mss_val -e ssl.handshake.version -e frame.time_delta -e ip.ttl -e ssl.handshake.extensions_server_name -e tcp.flags.ack -e tcp.flags.syn -e tcp.ack -e tcp.flags.reset -e frame.time_epoch -e gquic.tag.sni -E header=y -E separator=, -E quote=d -E occurrence=f > [dst]'
@@ -91,11 +91,14 @@ class DataFactory:
                             sample = SampleFactory.app_peaks_only(session, 0.1, dirName, with_first, is_skip)
                             tcp_data.append(sample)
                         elif feature_type == 'app_rr_session_only':
-                            headers = SampleFactory.app_rr_only(session, 0.05, 250, dirName)
+                            sample = SampleFactory.app_rr_only(session, 0.05, 250, dirName)
+                            tcp_data.append(sample)
                         elif feature_type == 'video_peak_session_only':
-                            headers = SampleFactory.video_peaks_only(session, 0.1, dirName, with_first, is_skip)
+                            sample = SampleFactory.video_peaks_only(session, 0.1, dirName, with_first, is_skip)
+                            tcp_data.append(sample)
                         elif feature_type == 'video_rr_session_only':
-                            headers = SampleFactory.video_rr_only(session, 0.05, 250, dirName)
+                            sample = SampleFactory.video_rr_only(session, 0.05, 250, dirName)
+                            tcp_data.append(sample)
                         elif feature_type == 'app_request_response':
                             sample = SampleFactory.application_by_request_response_session(session, 5, 0.05,
                                                                                      250, dirName)

@@ -45,7 +45,8 @@ class Interaction(PacketContainer):
                         sessions_list.append(curr_fiveple)
                         sess = Session(curr_fiveple[0], curr_fiveple[2],
                                                      curr_fiveple[4], curr_fiveple[1], curr_fiveple[3], self.pcap_df)
-                        if len(sess.getSample()) > 1:
+                        #we toss sessions which are unidirectional
+                        if not sess.flow_up.getSample().empty and not sess.flow_down.getSample().empty:
                             self.sessions.append(sess)
                             curr_fiveple = [curr_fiveple[0], curr_fiveple[2],
                                                          curr_fiveple[4], curr_fiveple[1], curr_fiveple[3]]
@@ -54,7 +55,6 @@ class Interaction(PacketContainer):
                             curr_fiveple.clear()
                         else:
                             pass
-
         return self.sessions
 
     def get_session_values(self):

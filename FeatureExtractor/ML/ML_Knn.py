@@ -14,7 +14,7 @@ Need upgrade this in this section
 
 
 def run_knn(test_size, num_of_neighbors):
-    dataset = draw_features("app_by_sessions_features")
+    dataset = draw_features("video_rr_session_features")
     dataset = pd.get_dummies(dataset)
     y = np.array(dataset['Label'])
     x = dataset.drop('Label', axis=1)
