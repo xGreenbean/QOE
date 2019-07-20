@@ -14,9 +14,9 @@ false_positive = 0
 false_negative = 0
 dict_list = []
 
-for dirName, subdirList, fileList in os.walk('/home/ehud/Desktop/silhouette-trace/'):
+for dirName, subdirList, fileList in os.walk('/home/cyberlab/Desktop/silhouette-trace/'):
     for fname in fileList:
-        if fname.startswith('raw') and fname.endswith('.csv'):
+        if fname.endswith('.csv'):
             interaction_curr = Interaction(pd.read_csv(os.path.join(dirName, fname)))
             streamer_curr = Streamer(interaction_curr, 5, 0.01, 250000)
             video_sessions = streamer_curr.get_video_related_sessions()
@@ -28,7 +28,7 @@ for dirName, subdirList, fileList in os.walk('/home/ehud/Desktop/silhouette-trac
                 found = False
                 for val in conf.video['video']:
 
-                    if val in video_sess.get_sni():
+                    if val in video_sess.get_sni() and video_sess.df['frame.len'].sum() > 1000000: # 1MB
                         true_positive += 1
                         found = True
                         break

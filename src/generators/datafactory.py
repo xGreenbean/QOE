@@ -21,7 +21,7 @@ class DataFactory:
     """creates the tshark's csv if dosent exists"""
     @staticmethod
     def make_csv():
-        for dirName, subdirList, fileList in os.walk():
+        for dirName, subdirList, fileList in os.walk('/home/cyberlab/Desktop/silhouette-trace'):
             for fname in fileList:
                 if fname.endswith('.pcap') and fname.replace('.pcap', '.csv') not in fileList:
                     os.system(tshark_pcap_to_csv.replace('[src]', os.path.join(dirName, fname))
@@ -37,7 +37,7 @@ class DataFactory:
 
     @staticmethod
     def rename_csv():
-        for dirName, subdirList, fileList in os.walk('/home/ehud/Desktop/silhouette-trace'):
+        for dirName, subdirList, fileList in os.walk('/home/Desktop/silhouette-trace'):
             for fname in fileList:
                 if fname.endswith('.csv') and not fname.startswith('raw'):
                     os.rename(os.path.join(dirName, fname), os.path.join(dirName, 'raw_' + fname))
@@ -131,3 +131,5 @@ class DataFactory:
 
         df = pd.DataFrame(dict_list)
         df.to_csv(path)
+
+DataFactory.make_csv()

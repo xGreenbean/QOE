@@ -32,40 +32,39 @@ class Interaction(PacketContainer):
             return self.clientIP
 
     """returns List of sessions, a session is a 4 tuple ipsrc,portsrc,ipdst,portdst"""
-    ## Maybe should handle better the TCP\UDP seperation.
+    # Maybe should handle better the TCP\UDP separation.
     def get_sessions(self):
-        curr_fiveple = None
         if len(self.sessions) == 0:
 
-            #group by tcp 4ple
+            # group by tcp 4ple
             unique_tcps = (self.df[(self.df['tcp.dstport'] == 443) & (self.df['ip.src'] == self.get_client_ip())]
-            .groupby(['ip.src','tcp.srcport','ip.dst','tcp.dstport']))
+                           .groupby(['ip.src', 'tcp.srcport', 'ip.dst', 'tcp.dstport']))
 
-            #group by udp 4ple
+            # group by udp 4ple
             unique_udps = (self.df[(self.df['udp.dstport'] == 443) & (self.df['ip.src'] == self.get_client_ip())]
-            .groupby(['ip.src', 'udp.srcport', 'ip.dst', 'udp.dstport']))
+                           .groupby(['ip.src', 'udp.srcport', 'ip.dst', 'udp.dstport']))
 
-            #add tcpc sessions
+            # add tcpc sessions
             for sess in unique_tcps.groups.keys():
 
                 new_session = Session('TCP', sess[0], sess[1],
-                                       sess[2], sess[3], self.df)
-                key = ['TCP', sess[0], sess[1],
-                       sess[2], sess[3]]
-                if len(new_session.df) > 10:
+                                      sess[2], sess[3], self.df)
+                if len(new_session.df) >= 10:
+                    key = ['TCP', sess[0], sess[1],
+                           sess[2], sess[3]]
                     self.sessions.append(new_session)
-                    #add sessions to Interactions dictionry
+                    # add sessions to Interactions dictionary
                     self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
 
             for sess in unique_udps.groups.keys():
-
-                new_session = Session('UDP', sess[0], sess[1],
-                                       sess[2], sess[3], self.df)
-                key = ['UDP', sess[0], sess[1],
-                       sess[2], sess[3]]
-                if len(new_session.df) > 10:
+                if len(new_session.df) >= 10:
+                    new_session = Session('UDP', sess[0], sess[1],
+                                          sess[2], sess[3], self.df)
+                    key = ['UDP', sess[0], sess[1],
+                           sess[2], sess[3]]
                     self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
                     self.sessions.append(new_session)
+
         return self.sessions
 
     """returns sessions values"""
@@ -77,7 +76,7 @@ class Interaction(PacketContainer):
 
         return values
 
-    """returns a sessions coressponding to a session key"""
+    """returns a sessions corresponding to a session key"""
     def get_session(self, sess_key):
         if self.sess_dict[sess_key]:
             return self.sess_dict[sess_key]
