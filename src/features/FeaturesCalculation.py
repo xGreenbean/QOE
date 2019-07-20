@@ -43,12 +43,15 @@ class FeaturesCalculation:
 
     """ Total number of packets """
     def packet_count(self):
+        if self.df.empty:
+            return 0
         return len(self.df)
 
     """ Mean of packet size """
     def mean_packet_size(self):
+        
         fu_fd_df = self.df
-        if len(fu_fd_df) == 0:
+        if fu_fd_df.empty:
             return 0
         if len(fu_fd_df) == 1:
             return fu_fd_df['frame.len'].values[0]
@@ -80,7 +83,7 @@ class FeaturesCalculation:
 
     """ Min time delta """
     def min_time_delta(self):
-        if len(self.df) == 0:
+        if self.df.empty:
             return 0
         return self.df['frame.time_delta'].min()
 
@@ -92,7 +95,7 @@ class FeaturesCalculation:
 
     """ time delta mean """
     def mean_time_delta(self):
-        if len(self.df) == 0:
+        if self.df.empty:
             return 0
         if len(self.df) == 1:
             return self.df['frame.time_delta'].values[0]
@@ -110,7 +113,6 @@ class FeaturesCalculation:
     def min_packet_size(self):
         if len(self.df) == 0:
             return 0
-
         return self.df['frame.len'].min()
 
     """ Max packet size """

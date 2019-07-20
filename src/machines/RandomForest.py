@@ -14,12 +14,12 @@ Need upgrade this in this section
 """
 
 
-def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor):
+def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor, classifier_features=[], classifier_labels=[]):
 
     #   only for video/no video, for app remove
     # One-hot encode the data using pandas get_dummies
 
-    features = pd.read_csv('C:\\QOE\\Src\\bins_breaker.csv')
+    features = pd.read_csv('C:\\QOE\\Src\\sess_breaker_t3.csv')
     print("video ",(features['label'] == 'video').sum(),"unknown ",
           (features['label'] != 'video').sum())
 
@@ -43,9 +43,14 @@ def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor):
 
     # Train the model on training data
     rf.fit(train_features, train_labels)
+    if len(classifier_features) != 0:
+        test_features = classifier_features
+        test_labels = classifier_labels
+
     predictions = rf.predict(test_features)
     # Calculate the absolute errors
     errors = abs(predictions - test_labels)
+
 
     print("Train Accuracy:", metrics.accuracy_score(train_labels, rf.predict(train_features)))
     print("Test Accuracy:", metrics.accuracy_score(predictions, test_labels))
@@ -55,7 +60,7 @@ def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor):
                                        index=cols,
                                        columns=['importance']).sort_values('importance', ascending=False)
     print(feature_importances)
-
+    return predictions
 def run_rfr_app(test_size, num_trees, rs_test_train, rs_regressor):
 
     #   only for video/no video, for app remove
@@ -97,5 +102,7 @@ def run_rfr_app(test_size, num_trees, rs_test_train, rs_regressor):
                                        index=cols,
                                        columns=['importance']).sort_values('importance', ascending=False)
     print(feature_importances)
+
+
 if __name__ == '__main__':
     run_rfr_video(0.30, 1256, 41, 42)
