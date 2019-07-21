@@ -57,13 +57,13 @@ class Interaction(PacketContainer):
                     self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
 
             for sess in unique_udps.groups.keys():
-                if len(new_session.df) >= 10:
                     new_session = Session('UDP', sess[0], sess[1],
                                           sess[2], sess[3], self.df)
-                    key = ['UDP', sess[0], sess[1],
-                           sess[2], sess[3]]
-                    self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
-                    self.sessions.append(new_session)
+                    if len(new_session.df) >= 10:
+                        key = ['UDP', sess[0], sess[1],
+                               sess[2], sess[3]]
+                        self.sess_dict[(''.join(str(x) + ' ' for x in key))] = new_session
+                        self.sessions.append(new_session)
 
         print(self.sess_dict.keys())
         return self.sessions

@@ -18,7 +18,7 @@ for dirName, subdirList, fileList in os.walk('/home/cyberlab/Desktop/silhouette-
     for fname in fileList:
         if fname.endswith('.csv'):
             interaction_curr = Interaction(pd.read_csv(os.path.join(dirName, fname)))
-            streamer_curr = Streamer(interaction_curr, 5, 0.01, 250000)
+            streamer_curr = Streamer(interaction_curr, 5, 0.0001, 250000)
             video_sessions = streamer_curr.get_video_related_sessions()
             not_video_sessions = streamer_curr.get_not_video_related_sessions()
 
@@ -28,7 +28,8 @@ for dirName, subdirList, fileList in os.walk('/home/cyberlab/Desktop/silhouette-
                 found = False
                 for val in conf.video['video']:
 
-                    if val in video_sess.get_sni() and video_sess.df['frame.len'].sum() > 1000000: # 1MB
+                    if val in video_sess.get_sni():
+                            # and video_sess.df['frame.len'].sum() > 1000000: # 1MB
                         true_positive += 1
                         found = True
                         break
@@ -61,7 +62,7 @@ for dirName, subdirList, fileList in os.walk('/home/cyberlab/Desktop/silhouette-
             # print(os.path.join(dirName, fname))
 try:
     print('accuracy', (true_positive + true_negative)/(true_positive + true_negative + false_positive + false_negative))
-    print('precision', (true_positive)/(true_positive + false_positive))
+    print('precision', true_positive/(true_positive + false_positive))
 except:
     pass
 df = pd.DataFrame(dict_list)

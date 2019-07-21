@@ -11,9 +11,9 @@ import keras.layers as layers
 from keras.utils.np_utils import to_categorical
 from sklearn.metrics import classification_report, confusion_matrix
 
-global video, _id, data
+global video, _id, data_path
 
-data = '/home/ehud/PycharmProjects/flowpic/data/'
+data_path = '/home/ehud/PycharmProjects/flowpic/data/'
 video = ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"]
 
 class Flowpic():
@@ -21,7 +21,7 @@ class Flowpic():
         self.np_array = np_array
         self.label = label
 
-class Dataset():
+class Interaction():
     def __init__(self, df):
         self.sni_dict = {}
         self.df = df
@@ -108,14 +108,14 @@ class Dataset():
             tcp_df['date'] = tcp_df['frame.time_epoch']. \
                 apply(datetime.datetime.fromtimestamp)  # convert epoch to datetime.
             # normalizing packet size, in paper it is unnormalized
-            tcp_df['frame.len'] = Dataset.map(tcp_df['frame.len'], 31)
+            tcp_df['frame.len'] = Interaction.map(tcp_df['frame.len'], 31)
 
             # divide to 60S intervals
             group_intervals = [item[1] for item in tcp_df.groupby(pd.Grouper(key='date', freq=('60S')))]
             for time_group in group_intervals:
                 if len(time_group) > 0:
 
-                    time_group['frame.time_epoch'] = Dataset.map(time_group['frame.time_epoch'], 31)
+                    time_group['frame.time_epoch'] = Interaction.map(time_group['frame.time_epoch'], 31)
                     arr = np.zeros((32, 32))
                     np.add.at(arr, (time_group['frame.time_epoch'].astype(int),
                                     time_group['frame.len'].astype(int)), 1)
@@ -200,6 +200,6 @@ def extract():
     for index,file in enumerate(csvs):
         print(index/ len(csvs),'% done')
         df = pd.read_csv(file)
-        Dataset(df)
+        Interaction(df)
 # extract()
 cnn()

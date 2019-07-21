@@ -27,7 +27,7 @@ videolike = {
 
 
 """path to dataset"""
-dataset_path = '/home/ehud/Desktop/dataset/'
+dataset_path = '/home/cyberlab/Desktop/canada/Pcaps/nontor'
 # ------------------------------------------------------------------------------------------------------------------
 """Breaker settings"""
 delta_t = 0.1

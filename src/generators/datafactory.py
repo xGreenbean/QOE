@@ -61,8 +61,8 @@ class DataFactory:
 
                     for sess in temp_interaction.get_sessions():
                         dict = {}
-                        dict.update([('filter', sess.to_filter()),('source_file', fname),
-                                     ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+                        dict.update([('filter', sess.to_filter()), ('source_file', fname),
+                                     ('label', sess.get_video_label(label_dict)), ('sni', sess.get_sni())])
 
                         dict.update(zip(conf.header_down, FeaturesCalculation(sess.get_flows()[1])
                                           .apply(conf.app_flowdown)))
@@ -105,7 +105,7 @@ class DataFactory:
                                 if len(bin) != 0:
                                     dict = {}
                                     dict.update([('filter', sess.to_filter()), ('source_file', fname),
-                                                 ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+                                                 ('label', sess.get_video_label(label_dict)), ('sni', sess.get_sni())])
                                     dict.update(zip(conf.header_break,
                                                     FeatureAggregation(bin)
                                                     .apply(conf.app_agg)))
@@ -119,7 +119,7 @@ class DataFactory:
                                 if len(bin) != 0:
                                     dict = {}
                                     dict.update([('filter', sess.to_filter()), ('source_file', fname),
-                                                 ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+                                                 ('label', sess.get_video_label(label_dict)), ('sni', sess.get_sni())])
                                     dict.update(zip(conf.header_break,
                                                     FeatureAggregation(bin)
                                                     .apply(conf.app_agg)))
