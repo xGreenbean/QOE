@@ -3,11 +3,13 @@ import pandas as pd
 import numpy as np
 import datetime
 import os
+from configs import conf
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import keras
 import keras.layers as layers
 from keras.utils.np_utils import to_categorical
+from sklearn.metrics import classification_report, confusion_matrix
 
 global video, _id, data
 
@@ -22,6 +24,7 @@ class Flowpic():
 class Dataset():
     def __init__(self, df):
         self.sni_dict = {}
+        self.df = df
         self.tcps_down = (df[df['tcp.srcport'] == 443]
                      .groupby(['ip.src', 'tcp.srcport', 'ip.dst', 'tcp.dstport']))
         self.tcps_up = (df[df['tcp.dstport'] == 443]
@@ -48,9 +51,9 @@ class Dataset():
             value = self.get_sni(udp_df, 'UDP')
             self.sni_dict[key] = value
 
-    def get_label(self, row):
+    def get_label(self, row, volume):
         sni = self.sni_dict[self.get_key(row)]
-        if True in [(x in sni) for x in video]:
+        if (True in [(x in sni) for x in video]) and (volume > 1000000): # volume > 1MB
             return 1
         else:
             return 0
@@ -100,6 +103,7 @@ class Dataset():
 
         for name, tcp_df in source:
             # dropping packets with len of > 1500 like in the papper.
+            volume = tcp_df['frame.len'].sum()
             tcp_df = tcp_df[tcp_df['frame.len'] < 1500]
             tcp_df['date'] = tcp_df['frame.time_epoch']. \
                 apply(datetime.datetime.fromtimestamp)  # convert epoch to datetime.
@@ -116,32 +120,36 @@ class Dataset():
                     np.add.at(arr, (time_group['frame.time_epoch'].astype(int),
                                     time_group['frame.len'].astype(int)), 1)
                     try:
-                        label = self.get_label(time_group.iloc[0])
+                        label = self.get_label(time_group.iloc[0], volume)
                         arr = arr.flatten()
                         arr = np.insert(arr, 0, label)
                         self.XY = np.vstack([self.XY, arr])
                     except:
                         pass
+        print(self.XY)
 
-        prev_xy = np.load("dataset.npy") if os.path.isfile("dataset.npy") else []  # get data if exist
+        prev_xy = np.load("dataset_ours.npy") if os.path.isfile("dataset_ours.npy") else []  # get data if exist
         if len(prev_xy) > 0:
-            np.save("dataset", np.vstack([prev_xy, self.XY]))  # save the new
+            np.save("dataset_ours", np.vstack([prev_xy, self.XY]))  # save the new
         else:
-            np.save("dataset", self.XY)  # save the new
+            np.save("dataset_ours", self.XY)  # save the new
 
 def cnn():
     num_clasess = 2
-    FL = np.load('dataset.npy')
+    FL = np.load('dataset_ours.npy')
+    np.random.shuffle(FL)
+    video = FL[np.concatenate(FL[:, :1] == 1, axis=0 ) , :]
+    non_video = FL[np.concatenate(FL[:, :1] == 0, axis=0 ), :][0:len(video), :]
+    FL = np.vstack((video, non_video))
     features = FL[:, 1:]
     labels = FL[:, :1]
+    counter = 0
     unique, counts = np.unique(labels, return_counts=True)
     print(dict(zip(unique, counts)))
-
     test = {}
     train = {}
     train['features'], test['features'], train['labels'], test['labels'] = train_test_split(
         features, labels, test_size=0.2, random_state=0)
-
     train['features'] = np.reshape(train['features'], (train['features'].shape[0], 32, 32, 1))
     test['features'] = np.reshape(test['features'], (test['features'].shape[0], 32, 32, 1))
     train['labels'] = to_categorical(train['labels'])
@@ -169,17 +177,29 @@ def cnn():
                   optimizer=keras.optimizers.Adam(),
                   metrics=['accuracy'])
 
-    model.fit(train['features'], train['labels'], epochs=EPOCHS,
+    model.fit(train['features'], train['labels'], epochs=EPOCHS,  validation_split=0.2,
                         shuffle=True)
 
+    y_pred = model.predict(test['features'])
     score = model.evaluate(test['features'], to_categorical(test['labels']))
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
+    matrix = confusion_matrix(to_categorical(test['labels']).argmax(axis=1), y_pred.argmax(axis=1))
+    print(matrix)
 
+def extract():
+    if os.path.exists('dataset_ours.npy'):
+        os.remove('dataset_ours.npy')
+    else:
+        print("Can not delete the file as it doesn't exists")
 
-for dirName, subdirList, fileList in os.walk('/home/ehud/Desktop/silhouette-trace/dataset'):
-    for fname in fileList:
-        if fname.endswith('.csv'):
-            df = pd.read_csv(os.path.join(dirName, fname))
-            ds = Dataset(df)
-# cnn()
+    csvs = []
+    for dirName, subdirList, fileList in os.walk(conf.dataset_path):
+        csvs.extend([os.path.join(dirName, fname) for fname in fileList if fname.endswith('.csv')])
+    print('starting...')
+    for index,file in enumerate(csvs):
+        print(index/ len(csvs),'% done')
+        df = pd.read_csv(file)
+        Dataset(df)
+# extract()
+cnn()

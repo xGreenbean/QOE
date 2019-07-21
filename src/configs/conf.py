@@ -27,7 +27,7 @@ videolike = {
 
 
 """path to dataset"""
-dataset_path = 'home/cyberlab/Desktop/dataset/'
+dataset_path = '/home/ehud/Desktop/dataset/'
 # ------------------------------------------------------------------------------------------------------------------
 """Breaker settings"""
 delta_t = 0.1
@@ -80,13 +80,13 @@ header_sess = ["s_packet_count", "s_min_packet_size", "s_max_packet_size",
               "s_size_var", "s_max_time_delta", "s_std_time_delta",
                             "s_min_time_delta", "s_mean_time_delta"]
 
-header_down = ["upstream_cipher_suites", "upstream_ssl_v", "upstream_ssl_session_id_len",
+header_up = ["upstream_cipher_suites", "upstream_ssl_v", "upstream_ssl_session_id_len",
                             "upstream_ssl_num_compression_methods", "u_packet_count", "u_min_packet_size",
                             "u_max_packet_size", "u_mean_packet_size", "u_std_packet_size", "u_size_var", "syn_tcp_scale",
                             "syn_mss", "syn_tcp_win_size", "u_max_time_delta", "u_std_time_delta", "u_min_time_delta",
                             "u_mean_time_delta", "upstream_mean_ttl", "upstream_num_keep_alive"]
 
-header_up = ["d_packet_count", "d_min_packet_size", "d_max_packet_size",
+header_down = ["d_packet_count", "d_min_packet_size", "d_max_packet_size",
                               "d_mean_packet_size", "d_std_packet_size", "d_size_var", "d_max_time_delta",
                "d_std_time_delta",
                               "d_min_time_delta", "d_mean_time_delta"]

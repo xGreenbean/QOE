@@ -1,6 +1,6 @@
 import os
 import shutil
-from configs import  conf
+from configs import conf
 from containers.Interaction import *
 from containers.Session import *
 from tools.Breaker import *
@@ -21,7 +21,7 @@ class DataFactory:
     """creates the tshark's csv if dosent exists"""
     @staticmethod
     def make_csv():
-        for dirName, subdirList, fileList in os.walk('/home/cyberlab/Desktop/silhouette-trace'):
+        for dirName, subdirList, fileList in os.walk(conf.dataset_path):
             for fname in fileList:
                 if fname.endswith('.pcap') and fname.replace('.pcap', '.csv') not in fileList:
                     os.system(tshark_pcap_to_csv.replace('[src]', os.path.join(dirName, fname))
