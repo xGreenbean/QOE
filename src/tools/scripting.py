@@ -3,12 +3,12 @@ import numpy as np
 import datetime
 import os
 import pickle
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 from collections import Counter
-import random
-import random
 global video, data_path, OTT, file_name
 
-file_name = 'pickle01MB.pickle'
+file_name = 'pickle1MB.pickle'
 data_path = '/home/cyberlab/Desktop/canada/'
 video = ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com", "vimeocdn",
          "cbp-us.nccp.netflix.com"]
@@ -43,7 +43,7 @@ class Interaction:
 
     def get_video_label(self, row, volume):
         sni = self.sni_dict[self.get_key(row)]
-        if (True in [(x in sni) for x in video]) and volume > 100000: # volume > 1MB
+        if (True in [(x in sni) for x in video]) and volume > 1000000: # volume > 1MB
             return 'video'
         else:
             return 'novideo'
@@ -100,6 +100,7 @@ class Interaction:
         sources = [self.tcp_down, self.udp_down, self.udp_up, self.tcp_up]
         for source in sources:
             for name, tcp_df in source:
+                tcp_df = tcp_df[np.isfinite(tcp_df['frame.time_epoch'])]
                 # dropping packets with len of > 1500 like in the papper.
                 volume = tcp_df['frame.len'].sum()
                 tcp_df = tcp_df[tcp_df['frame.len'] < 1500]
@@ -119,6 +120,7 @@ class Interaction:
 
                         unique, counts = np.unique(mults, return_counts=True)
                         pic_dic = dict(zip(unique, counts))
+
                         try:
                             video_label = self.get_video_label(time_group.iloc[0], volume)
                             ott_label = self.get_ott_label(time_group.iloc[0], volume)
@@ -153,8 +155,8 @@ def produce():
         csvs.extend([os.path.join(dirName, fname) for fname in fileList if fname.endswith('.csv')])
     print('starting...')
     for index, file in enumerate(csvs):
-        print(index / len(csvs), '% done')
         df = pd.read_csv(file)
+        print(file)
         Interaction(df).export()
 
 
@@ -163,7 +165,7 @@ def test_train():
         b = pickle.load(handle)
         vlabels = []
         olabels = []
-        random.shuffle(b)
+        np.random.shuffle(b)
         for dict in b:
             vlabels.append(dict['videolabel'])
             olabels.append(dict['ottlabel'])
@@ -178,16 +180,16 @@ def test_train():
         test_novideo_counter = 0
         for curr_dict in b:
             if curr_dict['videolabel'] == 'video':
-                if test_video_counter < num_video/2:
+                if test_video_counter < num_video*0.3:
                     test.append(curr_dict)
                     test_video_counter += 1
-                elif train_video_counter < num_video/2:
+                elif train_video_counter < num_video*0.7:
                     train.append(curr_dict)
                     train_video_counter += 1
-            elif test_novideo_counter < num_video/2:
+            elif test_novideo_counter < num_video*0.3:
                 test.append(curr_dict)
                 test_novideo_counter += 1
-            elif train_novideo_counter < num_video/2:
+            elif train_novideo_counter < num_video*0.7:
                 train.append(curr_dict)
                 train_novideo_counter += 1
             if train_video_counter + train_novideo_counter + test_video_counter + test_novideo_counter >= num_video*2:
@@ -202,7 +204,6 @@ def test_train():
         b = pickle.load(handle)
         vlabels = []
         olabels = []
-        random.shuffle(b)
         for dict in b:
             vlabels.append(dict['videolabel'])
             olabels.append(dict['ottlabel'])
@@ -211,10 +212,20 @@ def test_train():
         b = pickle.load(handle)
         vlabels = []
         olabels = []
-        random.shuffle(b)
         for dict in b:
             vlabels.append(dict['videolabel'])
             olabels.append(dict['ottlabel'])
         print(Counter(vlabels))
+
+def paint_something():
+    with open('filename.pickle', 'rb') as handle:
+        b = pickle.load(handle)
+        vlabels = []
+        olabels = []
+        np.random.shuffle(b)
+        for dict in b:
+            vlabels.append(dict['videolabel'])
+            olabels.append(dict['ottlabel'])
+        c = Counter(vlabels)
 
 test_train()

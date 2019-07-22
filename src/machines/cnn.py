@@ -1,26 +1,16 @@
-import pandas as pd
 import numpy as np
-import datetime
-import os
-from configs import conf
-import tensorflow as tf
-from sklearn.model_selection import train_test_split
 import keras
 import keras.layers as layers
-from keras.utils.np_utils import to_categorical
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report
 import pickle
-from sklearn.preprocessing import LabelBinarizer
-from collections import Counter
-import psutil
-
-
-# def balance(dict_list):
+from sklearn.preprocessing import LabelEncoder
+from keras.layers import Dropout
 
 
 def pickle_image_generator(input_path, bs, lb, mode="train", aug=None):
     with open(input_path, 'rb') as handle:
         b = pickle.load(handle)
+        np.random.shuffle(b)
         it = iter(b)
         while True:
             # initialize our batches of images and labels
@@ -45,15 +35,15 @@ def pickle_image_generator(input_path, bs, lb, mode="train", aug=None):
 
                 arr = arr.reshape((1500, 1500))
                 # update our corresponding batches lists
-                features.append(arr)
+                features.append(arr.reshape(1500, 1500, 1))
                 labels.append(label)
             labels = lb.transform(np.array(labels))
-            yield (np.vstack(features).reshape(len(features), 1500, 1500, 1), labels)
+            yield (np.array(features), labels)
 
 
 def cnn():
-    num_clasess = 3
-    labels = ['video', 'novideo', 'maybe']
+    num_clasess = 1
+    labels = ['video', 'novideo']
     # initialize the paths to our training and testing CSV files
     TRAIN_PICKLE = "/home/cyberlab/Desktop/QOE/src/tools/train.pickle"
     TEST_PICKLE = "/home/cyberlab/Desktop/QOE/src/tools/test.pickle"
@@ -79,7 +69,7 @@ def cnn():
         for curr_dict in b:
             testLabels.append(curr_dict['videolabel'])
 
-    lb = LabelBinarizer()
+    lb = LabelEncoder()
     lb.fit(labels)
     testLabels = lb.transform(testLabels)
     # initialize both the training and testing image generators
@@ -93,18 +83,17 @@ def cnn():
     model.add(layers.Conv2D(filters=10, kernel_size=(10, 10), strides=5,
                             activation='relu', input_shape=(1500, 1500, 1)))
     model.add(layers.MaxPooling2D())
-
+    model.add(Dropout(0.1))
     model.add(layers.Conv2D(filters=20, kernel_size=(10, 10), strides=5,
                             activation='relu'))
     model.add(layers.MaxPooling2D())
-
+    model.add(Dropout(0.1))
     model.add(layers.Flatten())
-
     model.add(layers.Dense(units=64, activation='relu'))
+    model.add(layers.Dense(units=64, activation='relu'))
+    model.add(layers.Dense(units=num_clasess, activation='sigmoid'))
 
-    model.add(layers.Dense(units=num_clasess, activation='softmax'))
-
-    model.compile(loss=keras.losses.categorical_crossentropy,
+    model.compile(loss='binary_crossentropy',
                   optimizer=keras.optimizers.Adam(),
                   metrics=['accuracy'])
 
@@ -123,11 +112,9 @@ def cnn():
     # label with the corresponding largest predicted probability
     predIdxs = model.predict_generator(testGen,
                                        steps=(NUM_TEST_IMAGES // BS) + 1)
-    predIdxs = np.argmax(predIdxs, axis=1)
-
     # show a nicely formatted classification report
     print("[INFO] evaluating network...")
-    print(classification_report(testLabels.argmax(axis=1), predIdxs,
+    print(classification_report(testLabels, (predIdxs > 0.5),
                                 target_names=lb.classes_))
 
 cnn()
