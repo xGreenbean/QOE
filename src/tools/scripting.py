@@ -17,15 +17,17 @@ OTT = {
     "facebook": ["fbcdn"],
     "youtube": ["googlevideo"],
     "instagram": ["cdnistagram"],
-    "vimeo" : ["vimeocdn"]
-    }
+    "vimeo" : ["vimeocdn"],
+    "cnn": ["cnnios-f.akamaihd.net"]
+}
 
 udp_grouping = ['ip.src', 'udp.srcport', 'ip.dst', 'udp.dstport']
 tcp_grouping = ['ip.src', 'tcp.srcport', 'ip.dst', 'tcp.dstport']
 
 
 class Interaction:
-    def __init__(self, df):
+    def __init__(self, df, fname):
+        self.fname = fname
         self.sni_dict = {}
         self.df = df
         self.tcp_down = (df[df['tcp.srcport'] == 443].groupby(tcp_grouping))
@@ -99,24 +101,24 @@ class Interaction:
         dict_list = []
         sources = [self.tcp_down, self.udp_down, self.udp_up, self.tcp_up]
         for source in sources:
-            for name, tcp_df in source:
-                tcp_df = tcp_df[np.isfinite(tcp_df['frame.time_epoch'])]
+            for name, _df in source:
+
+                _df = _df[np.isfinite(_df['frame.time_epoch'])]
                 # dropping packets with len of > 1500 like in the papper.
-                volume = tcp_df['frame.len'].sum()
-                tcp_df = tcp_df[tcp_df['frame.len'] < 1500]
-                tcp_df['date'] = tcp_df['frame.time_epoch']. \
+                volume = _df['frame.len'].sum()
+                _df = _df[_df['frame.len'] < 1500]
+                _df['date'] = _df['frame.time_epoch']. \
                     apply(datetime.datetime.fromtimestamp)  # convert epoch to datetime.
-                tcp_df['date'] -= tcp_df['date'].min()
+                _df['date'] -= _df['date'].min()
 
                 # divide to 60S intervals
-                group_intervals = [item[1] for item in tcp_df.groupby(pd.Grouper(key='date', freq='60S'))]
+                group_intervals = [item[1] for item in _df.groupby(pd.Grouper(key='date', freq='60S'))]
                 for time_group in group_intervals:
                     if len(time_group) > 0:
 
                         time_group['frame.time_epoch'] = Interaction.map(time_group['frame.time_epoch'], 1499)
-
-                        mults = (time_group['frame.time_epoch'].astype(int) *
-                                 time_group['frame.len'].astype(int))
+                        mults = (time_group['frame.time_epoch'].astype(int) +
+                                 (time_group['frame.len'].astype(int) * 1500))
 
                         unique, counts = np.unique(mults, return_counts=True)
                         pic_dic = dict(zip(unique, counts))
@@ -217,15 +219,52 @@ def test_train():
             olabels.append(dict['ottlabel'])
         print(Counter(vlabels))
 
-def paint_something():
+def test_train_ott():
     with open('filename.pickle', 'rb') as handle:
+        b = pickle.load(handle)
+        np.random.shuffle(b)
+
+        train = []
+        test = []
+        vlabels = []
+        for curr_dict in b:
+            vlabels.append(curr_dict['videolabel'])
+        c = Counter(vlabels)
+        num_video = c['video']
+
+        c_train = 0
+        c_test = 0
+        for curr_dict in b:
+            if curr_dict['videolabel'] == 'video':
+                if c_test < num_video*0.3:
+                    test.append(curr_dict)
+                    c_test += 1
+                elif c_train < num_video*0.7:
+                    train.append(curr_dict)
+                    c_train += 1
+
+    with open('train_ott.pickle', 'wb') as handle:
+        pickle.dump(train, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('test_ott.pickle', 'wb') as handle:
+        pickle.dump(test, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('train_ott.pickle', 'rb') as handle:
         b = pickle.load(handle)
         vlabels = []
         olabels = []
-        np.random.shuffle(b)
         for dict in b:
             vlabels.append(dict['videolabel'])
             olabels.append(dict['ottlabel'])
-        c = Counter(vlabels)
+        print(Counter(olabels))
+    with open('test_ott.pickle', 'rb') as handle:
+        b = pickle.load(handle)
+        vlabels = []
+        olabels = []
+        for dict in b:
+            vlabels.append(dict['videolabel'])
+            olabels.append(dict['ottlabel'])
+        print(Counter(olabels))
 
-test_train()
+
+produce()
