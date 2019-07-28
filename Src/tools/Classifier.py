@@ -32,6 +32,8 @@ class Classifier:
         tcp_videos, udp_videos = Classifier.find_videos(prediction, filters)
         return Classifier.decision_method(tcp_videos, udp_videos)
 
+
+
     """
     Function gets lists of tcp and udp sessions which were found as a video session, then based
     on the list sizes we decide the traffic method  

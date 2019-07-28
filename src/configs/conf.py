@@ -28,12 +28,12 @@ videolike = {
 
 """path to dataset"""
 
-dataset_path = 'C:\\Users\\Saimon\\Desktop\\dataset'
+dataset_path = 'C:\\Users\\Saimon\\Desktop\\h'
 
 # ------------------------------------------------------------------------------------------------------------------
 """Breaker settings"""
-delta_t = 0.1
-threshold_t = 400
+delta_t = 0.05
+threshold_t = 250
 
 # ---------------------------------- Video/non and Application features for classification  -------------------------
 

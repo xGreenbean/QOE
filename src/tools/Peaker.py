@@ -5,6 +5,8 @@ from configs import conf
 Class Peaker
     Breaks a dataframe into peak pieces
 """
+
+
 class Peaker(object):
     """delta_t is time in seconds, to group the dataframe by"""
     def __init__(self, df, delta_t=conf.delta_t):

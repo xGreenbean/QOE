@@ -1,16 +1,24 @@
 import os
-import shutil
-from configs import  conf
 from containers.Interaction import *
-from containers.Session import *
 from tools.Breaker import *
 from tools.Peaker import *
 from features.FeatureAggregation import *
 from features.FeaturesCalculation import *
+from tools.BigPacket import BigPacket
 import pandas as pd
 global tshark_pcap_to_csv
+global up_link
+global down_link
+global num_req_res
+global first_packet_time
+global last_packet_time
 
 
+up_link = 0
+down_link = 1
+num_req_res = 2
+first_packet_time = 3
+last_packet_time = 4
 tshark_pcap_to_csv = 'C:\\"Program Files"\\Wireshark\\tshark.exe -r [src] -T fields -e frame.number -e frame.time -e frame.len -e ip.src -e ip.dst -e ip.proto -e tcp.srcport -e tcp.dstport -e udp.srcport -e udp.dstport -e tls.handshake.session_id_length -e tls.handshake.comp_methods_length -e tls.handshake.extension.len -e tls.handshake.cipher_suites_length -e tcp.window_size -e tcp.options.wscale.shift -e tcp.analysis.keep_alive -e tcp.options.mss_val -e tls.handshake.version -e frame.time_delta -e ip.ttl -e tls.handshake.extensions_server_name -e tcp.flags.ack -e tcp.flags.syn -e tcp.ack -e tcp.flags.reset -e frame.time_epoch -e gquic.tag.sni -E header=y -E separator=, -E quote=d -E occurrence=f > [dst]'
 
 
@@ -132,4 +140,13 @@ class DataFactory:
         df = pd.DataFrame(dict_list)
         df.to_csv(path)
 
-DataFactory.make_csv()
+    def idk_to_csv(sni='fbcdn'):
+        for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
+            for fname in fileList:
+                if fname.endswith('.csv'):
+                    bp = BigPacket(csv_path=os.path.join(dirName, fname), interval_size=1, lookup_sni=sni)
+                    print(bp.bp_break())
+
+
+DataFactory.idk_to_csv()
+

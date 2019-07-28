@@ -98,3 +98,5 @@ class Interaction(PacketContainer):
             curr_fiveple = ['UDP', row['ip.dst'], row['udp.dstport'], row['ip.src'], row['udp.srcport']]
 
         return ''.join(str(x) + ' ' for x in curr_fiveple)
+    
+    
