@@ -38,6 +38,22 @@ class Peaker(object):
 
     def get_bins(self, bin_size):
         peaks = self.get_dfs()
+
+        bins_list = []
+        df = []
+        if len(peaks) < bin_size:
+            bins_list.append(peaks)
+            return bins_list
+        for i in range(len(peaks) - bin_size + 1):
+            for j in range(bin_size):
+                df.append(peaks[i + j])
+            bins_list.append(df)
+            df = []
+        return bins_list
+
+    @staticmethod
+    def get_bins(bin_size, df_list=None):
+        peaks = df_list
         bins_list = []
         df = []
         if len(peaks) < bin_size:

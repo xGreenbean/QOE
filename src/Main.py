@@ -10,8 +10,8 @@ import pandas as pd
 
 
 if __name__ == '__main__':
-    DataFactory.sessions_to_csv(breaker=True,path=dataset_path + "\\" + 'sess_breaker_features.csv')
+    #DataFactory.sessions_to_csv(breaker=True,path=dataset_path + "\\" + 'sess_breaker_features.csv')
     # DataFactory.sessions_to_csv(peaker=True,path='sess_peaker')
-    #DataFactory.make_csv()
+    DataFactory.make_csv()
     #DataFactory.bins_to_csv(peaker=True,path='bin_speaker.csv')
 

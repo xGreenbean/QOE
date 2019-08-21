@@ -1,4 +1,5 @@
 from containers.Flow import *
+import pandas as pd
 from containers.PacketContainer import PacketContainer
 from features.FeaturesCalculation import FeaturesCalculation
 """
@@ -7,11 +8,13 @@ Class Session
     In this class we filter all the packets that belongs to the session,
     then we separate them to flows, upstreams and downstreams
 """
+pd.options.mode.chained_assignment = None
 
 
 class Session(PacketContainer):
 
     def __init__(self, protocol, src_ip, src_port, dst_ip, dst_port, df):
+
         self.srcPort = src_port
         self.srcIp = src_ip
         self.dstIp = dst_ip
@@ -36,6 +39,8 @@ class Session(PacketContainer):
         filter_ips = self.get_filtered_ips(df)
         tcp_packets = filter_ips.loc[(filter_ips['tcp.srcport'].isin([self.srcPort]) & filter_ips['tcp.dstport'].isin([self.dstPort]))
             | (filter_ips['tcp.srcport'].isin([self.dstPort]) & filter_ips['tcp.dstport'].isin([self.srcPort]))]
+
+        tcp_packets['key'] = self.get_string()
         return tcp_packets
 
     """
@@ -46,6 +51,7 @@ class Session(PacketContainer):
         filter_ips = self.get_filtered_ips(df)
         udp_packets = filter_ips.loc[(filter_ips['udp.srcport'].isin([self.srcPort]) & filter_ips['udp.dstport'].isin([self.dstPort]))
                      | (filter_ips['udp.srcport'].isin([self.dstPort]) & filter_ips['udp.dstport'].isin([self.srcPort]))]
+        udp_packets['key'] = self.get_string()
         return udp_packets
 
     """

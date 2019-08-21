@@ -227,11 +227,6 @@ class FeaturesCalculation:
             return df['tls.handshake.session_id_length'].iloc[0]
         return 0
 
-    """
-    The number of SSL extensions in the client hello packet
-    """
-    def upstream_ssl_num_extensions(self):
-        return "plop"
 
 
 

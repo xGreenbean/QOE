@@ -33,6 +33,7 @@ Request Response features:
        responses requests inter arrival time max
 """
 
+
 class FeatureAggregation:
     def __init__(self, df_array):
         self.df_list = df_array
@@ -69,16 +70,17 @@ class FeatureAggregation:
         return self.sizes.min()
 
     def mean_element_size(self):
-        return  self.sizes.mean()
+        return self.sizes.mean()
 
     def std_element_size(self):
-        return  self.sizes.std()
+        return self.sizes.std()
 
     def max_silence_time(self):
         return self.silences.max()
 
     def min_silence_time(self):
-        return self.silences.min()
+        min_sil = self.silences
+        return np.min(min_sil[np.nonzero(min_sil)])
 
     def mean_silence_time(self):
         return self.silences.mean()
@@ -87,7 +89,7 @@ class FeatureAggregation:
         return self.silences.std()
 
     def max_element_length(self):
-        return  self.lens.max()
+        return self.lens.max()
 
     def min_element_length(self):
         return self.lens.min()

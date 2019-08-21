@@ -18,9 +18,9 @@ last_packet_time = 4
 
 class BigPacket:
 
-    def __init__(self, interval_size, csv_path, lookup_sni):
+    def __init__(self, interval_size, df, lookup_sni):
         self.interval_size = interval_size
-        self.df = pd.read_csv(csv_path)
+        self.df = df
         self.sni = lookup_sni
 
     def bp_break(self):
@@ -51,32 +51,32 @@ class BigPacket:
     def divide_intervals(self):
         df = self.df.dropna(subset=['frame.time_epoch'])
         df['date'] = df['frame.time_epoch'].apply(datetime.datetime.fromtimestamp)
-        group_intervals = df.groupby(pd.Grouper(key='date', freq=(str(self.interval_size) + 'S')))
-        return group_intervals
+        return df.groupby(pd.Grouper(key='date', freq=(str(self.interval_size) + 'S')))
 
     def calculate_sessions_intervals(self):
         df_list = []
         sni_dic = {}
         divided_intervals = self.divide_intervals()
+
         for item in divided_intervals:
             temp_interaction = Interaction(item[1])
             dict_sess = {}
             for sess in temp_interaction.get_sessions():
-                if sess.get_sni() is not "None":
-                    sess_sni = sess.get_sni()
+                sess_sni = sess.get_sni()
+                if sess_sni is not "None":
                     sni_dic[sess.get_string()] = sess.get_sni()
-                else:
+                elif sess.get_string() in sni_dic:
                     sess_sni = sni_dic[sess.get_string()]
 
                 if self.sni in sess_sni:
-                    req_res_list = Breaker(sess)
+                    req_res_list = Breaker()
                     flow_up, flow_down = sess.get_flows()
                     up_link_size = flow_up['frame.len'].sum()
                     down_link_size = flow_down['frame.len'].sum()
                     dict_sess[sess.get_string()] = [up_link_size,
-                                                    down_link_size, len(req_res_list.get_dfs()),
-                                                    sess.get_df()['frame.time_epoch'].iloc[0],
-                                                    sess.get_df()['frame.time_epoch'].iloc[len(sess.get_df()) - 1]]
+                                                    down_link_size, len(req_res_list.get_dfs(sess.get_df())),
+                                                    sess.get_df()['frame.time_epoch'].min(),
+                                                    sess.get_df()['frame.time_epoch'].max()]
             if len(dict_sess) != 0:
                 df_list.append(dict_sess)
         return df_list
@@ -91,11 +91,25 @@ class BigPacket:
             down_link_sum = 0
             req_res_counter = 0
             for key in curr_dict:
-                up_link_sum += curr_dict[key][0]
-                down_link_sum += curr_dict[key][1]
-                req_res_counter += curr_dict[key][2]
-                start_epoch_list.append(curr_dict[key][3])
-                end_epoch_list.append(curr_dict[key][4])
+                up_link_sum += curr_dict[key][up_link]
+                down_link_sum += curr_dict[key][down_link]
+                req_res_counter += curr_dict[key][num_req_res]
+                start_epoch_list.append(curr_dict[key][first_packet_time])
+                end_epoch_list.append(curr_dict[key][last_packet_time])
             aggregation_list.append([up_link_sum, down_link_sum, req_res_counter, min(start_epoch_list),
                                      max(end_epoch_list)])
         return aggregation_list
+
+    def get_bins(self, bin_size):
+        bp_list = self.bp_break()
+        bins_list = []
+        df = []
+        if len(bp_list) < bin_size:
+            bins_list.append(bp_list)
+            return bins_list
+        for i in range(len(bp_list) - bin_size + 1):
+            for j in range(bin_size):
+                df.append(bp_list[i + j])
+            bins_list.append(df)
+            df = []
+        return bins_list

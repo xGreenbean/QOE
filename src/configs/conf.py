@@ -9,26 +9,31 @@ application_sni = {
     "YouTube": ["googlevideo"],
     "Instagram": ["cdnistagram"],
     "OtherOTT": ["video.twimg.com", "cnnios-f.akamaihd.net"],
-    "unknown":[]
+    "unknown": []
 }
 
 video = {
     "video": ["nflxvideo", "fbcdn", "googlevideo", "cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"],
-    "unknown":[]
+    "unknown": []
 }
 
 videolike = {
     "video": ["nflxvideo", "fbcdn", "googlevideo","cdnistagram", "cnnios-f.akamaihd.net", "video.twimg.com"],
     "video_like": [],
-    "unknown":[]
+    "unknown": []
 }
 
-
+quality_dict = {
+    ' 1280x720': 1,
+    ' 864x480': 2,
+    ' 640x368': 3,
+    ' 1920x1088': 4,
+}
 
 
 """path to dataset"""
 
-dataset_path = 'C:\\Users\\Saimon\\Desktop\\h'
+dataset_path = 'C:\\Users\\Saimon\\Desktop\\faf'
 
 # ------------------------------------------------------------------------------------------------------------------
 """Breaker settings"""
@@ -59,11 +64,42 @@ app_flowdown = ["packet_count", "min_packet_size", "max_packet_size",
                               "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
                               "min_time_delta", "mean_time_delta"]
 
+quality_bp = ["packet_count", "min_packet_size", "max_packet_size",
+                              "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
+                              "min_time_delta", "mean_time_delta", "duration", "packets_size", "upstream_mean_ttl",
+              "size_histogram"]
+
+quality_peaks = ["packet_count", "min_packet_size", "max_packet_size",
+                              "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
+                              "min_time_delta", "mean_time_delta", "duration", "packets_size", "upstream_mean_ttl",
+                 "size_histogram"]
+
+quality_breaker = ["packet_count", "min_packet_size", "max_packet_size",
+                              "mean_packet_size", "std_packet_size", "size_var", "max_time_delta", "std_time_delta",
+                              "min_time_delta", "mean_time_delta", "duration", "packets_size", "upstream_mean_ttl",
+                   "size_histogram"]
+
 # ------------------------------------------------------------------------------------------------------------------
 #Headers..
+
 header_first = ["f_packet_count", "f_min_packet_size", "f_max_packet_size",
-                            "f_mean_packet_size", "f_std_packet_size", "f_size_var", "f_max_time_delta", "f_std_time_delta",
-                            "f_min_time_delta", "f_mean_time_delta"]
+                "f_mean_packet_size", "f_std_packet_size", "f_size_var", "f_max_time_delta",
+                "f_std_time_delta", "f_min_time_delta", "f_mean_time_delta"]
+
+header_quality_bp = ["bp_packet_count", "bp_min_packet_size", "bp_max_packet_size",
+                     "bp_mean_packet_size", "bp_std_packet_size", "bp_size_var", "bp_max_time_delta",
+                     "bp_std_time_delta", "bp_min_time_delta", "bp_mean_time_delta", "bp_duration", "bp_packets_size",
+                     "bp_upstream_mean_ttl", "bp_size_histogram"]
+
+header_quality_peaks = ["peak_packet_count", "peak_min_packet_size", "peak_max_packet_size",
+                     "peak_mean_packet_size", "peak_std_packet_size", "peak_size_var", "peak_max_time_delta",
+                     "peak_std_time_delta", "peak_min_time_delta", "peak_mean_time_delta", "peak_duration",
+                        "peak_packets_size", "peak_upstream_mean_ttl", "peak_size_histogram"]
+
+header_quality_breaker = ["req_res_packet_count", "req_res_min_packet_size", "req_res_max_packet_size",
+                     "req_res_mean_packet_size", "req_res_std_packet_size", "req_res_size_var", "req_res_max_time_delta",
+                     "req_res_std_time_delta", "req_res_min_time_delta", "req_res_mean_time_delta", "req_res_duration",
+                          "req_res_packets_size", "req_res_upstream_mean_ttl", "req_res_size_histogram"]
 
 header_peak = ["p_max_element_size", "p_min_element_size", "p_mean_element_size",
                  "p_std_element_size","p_max_silence_time",

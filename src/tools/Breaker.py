@@ -1,6 +1,4 @@
-from containers.Session import *
 import pandas as pd
-from configs import conf
 """
 Class Breaker
     Breaks a session into Request and Response pieces,
@@ -8,26 +6,31 @@ Class Breaker
     act: like a part of a play, or 'מערכה' in hebrew
 """
 
+
 class Breaker(object):
-    def __init__(self, session, delta_t=conf.delta_t, threshold_t=conf.threshold_t):
-        """pandas data frame, represents a session"""
-        self.session = session
+    def __init__(self, delta_t=0.03, threshold_t=300):
         """threshold_t, represents GET minimum request size"""
         self.threshold_t = threshold_t
         """delta_t, minimum time between requests"""
         self.delta_t = delta_t
 
     """returns pandas dataframe[], with each element being a request and its response"""
-    def sess_break(self):
+    def sess_break(self, df):
         acts = []
         request_start_time = 0
         act = []
-        for index, row in self.session.df.iterrows():
+
+        for index, row in df.iterrows():
             """check for clients packets requests"""
-            if row['ip.src'] == self.session.srcIp and row['frame.len'] > self.threshold_t and\
-                    (request_start_time == 0 or row['frame.time_epoch'] - request_start_time > self.delta_t):
+            if 'UDP' in row['key']:
+                dst_port = row['udp.dstport']
+            else:
+                dst_port = row['tcp.dstport']
+
+            if dst_port == 443 and row['frame.len'] > self.threshold_t and\
+                    (request_start_time == 0 or ((row['frame.time_epoch'] - request_start_time) > self.delta_t)):
                 if act:
-                    acts.append(pd.DataFrame(self.session.df.loc[act]))
+                    acts.append(pd.DataFrame(df.loc[act]))
                     act.clear()
 
                 request_start_time = row['frame.time_epoch']
@@ -38,15 +41,20 @@ class Breaker(object):
                     act.append(index)
 
         if act:
-            acts.append(pd.DataFrame(self.session.df.loc[act]))
+            acts.append(pd.DataFrame(df.loc[act]))
+        if not acts:
+            print(df[['key','frame.len']])
         return acts
 
     """returns list of data frames, each data frame is an act"""
-    def get_dfs(self):
-        return self.sess_break()
+    def get_dfs(self, df):
+        return self.sess_break(df)
 
-    def get_bins(self, bin_size):
-        acts = self.sess_break()
+    def get_bins(self, bin_size=3, df=None, df_list=None):
+        if df_list is None:
+            acts = self.sess_break(df)
+        else:
+            acts = df_list
         bins_list = []
         df = []
         if len(acts) < bin_size:
@@ -58,3 +66,5 @@ class Breaker(object):
             bins_list.append(df)
             df = []
         return bins_list
+
+
