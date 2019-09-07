@@ -1,5 +1,6 @@
 
 import numpy as np
+import pandas as pd
 """
 FIX:
 """
@@ -11,6 +12,8 @@ Class fields:
 df - data frame
 """
 
+from configs import conf
+
 
 class FeaturesCalculation:
 
@@ -20,9 +23,18 @@ class FeaturesCalculation:
         self.client_hello_pkt = df[df['tls.handshake.extensions_server_name'].notnull()]
         """ Get SYN packet """
         self.syn_pkt = df[(df['tcp.flags.syn'] == 1) & (df['tcp.flags.ack'] == 0)]
-    
-    def apply(self, feature_list):
+
+    def apply(self, feature_list, flag_tran=False):
         vector = []
+
+        """
+        if flag_tran:
+            if 'UDP' in self.df.iloc[0]['key']:
+                filtered_features = [feature for feature in feature_list if 'udp' in feature]
+            else:
+                filtered_features = [feature for feature in feature_list if 'tcp' in feature]
+            feature_list = conf.network_feautures + filtered_features
+        """
         for feature in feature_list:
             method = getattr(self, feature)
             vector.append(method())
@@ -93,6 +105,11 @@ class FeaturesCalculation:
             return 0
         return self.df['frame.time_delta'].max()
 
+    def var_time_delta(self):
+        if len(self.df) == 0:
+            return 0
+        return self.df['frame.time_delta'].var()
+
     """ time delta mean """
     def mean_time_delta(self):
         if self.df.empty:
@@ -148,7 +165,7 @@ class FeaturesCalculation:
     def size_histogram(self):
         fu_fd_df = self.df
         hist = np.histogram(fu_fd_df['frame.len'], bins=[ 0.,   160.,   320.,   480.,   640.,   800.,   960.,  1120., 1280.,  1440.,  1600. ])
-        return hist[0]
+        return max(hist[0])
 
     """
     TCP keep alive packet count
@@ -227,6 +244,238 @@ class FeaturesCalculation:
             return df['tls.handshake.session_id_length'].iloc[0]
         return 0
 
+    def tran_len_sum(self):
+        df_udp = self.df['udp.length']
+        df_tcp = self.df['tcp.len']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.sum()
 
+        return 0
 
+    def tran_len_max(self):
+        df_udp = self.df['udp.length']
+        df_tcp = self.df['tcp.len']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.max()
+        return 0
+
+    def tran_len_min(self):
+        df_udp = self.df['udp.length']
+        df_tcp = self.df['tcp.len']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.min()
+        return 0
+
+    def tran_len_var(self):
+        df_udp = self.df['udp.length']
+        df_tcp = self.df['tcp.len']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.var()
+        return 0
+
+    def tran_len_mean(self):
+        df_udp = self.df['udp.length']
+        df_tcp = self.df['tcp.len']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.mean()
+        return 0
+
+    def tran_len_std(self):
+        df_udp = self.df['udp.length']
+        df_tcp = self.df['tcp.len']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.std()
+        return 0
+
+    def tran_time_relative_sum(self):
+        df_udp = self.df['udp.time_relative']
+        df_tcp = self.df['tcp.time_relative']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.sum()
+        return 0
+
+    def tran_time_relative_max(self):
+        df_udp = self.df['udp.time_relative']
+        df_tcp = self.df['tcp.time_relative']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.max()
+        return 0
+
+    def tran_time_relative_min(self):
+        df_udp = self.df['udp.time_relative']
+        df_tcp = self.df['tcp.time_relative']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.min()
+        return 0
+
+    def tran_time_relative_var(self):
+        df_udp = self.df['udp.time_relative']
+        df_tcp = self.df['tcp.time_relative']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.var()
+        return 0
+
+    def tran_time_relative_mean(self):
+        df_udp = self.df['udp.time_relative']
+        df_tcp = self.df['tcp.time_relative']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.mean()
+        return 0
+
+    def tran_time_relative_std(self):
+        df_udp = self.df['udp.time_relative']
+        df_tcp = self.df['tcp.time_relative']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.std()
+        return 0
+
+    def tran_time_delta_sum(self):
+        df_udp = self.df['udp.time_delta']
+        df_tcp = self.df['tcp.time_delta']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.sum()
+        return 0
+
+    def tran_time_delta_max(self):
+        df_udp = self.df['udp.time_delta']
+        df_tcp = self.df['tcp.time_delta']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.max()
+        return 0
+
+    def tran_time_delta_min(self):
+        df_udp = self.df['udp.time_delta']
+        df_tcp = self.df['tcp.time_delta']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.min()
+        return 0
+
+    def tran_time_delta_var(self):
+        df_udp = self.df['udp.time_delta']
+        df_tcp = self.df['tcp.time_delta']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.var()
+        return 0
+
+    def tran_time_delta_mean(self):
+        df_udp = self.df['udp.time_delta']
+        df_tcp = self.df['tcp.time_delta']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.mean()
+        return 0
+
+    def tran_time_delta_std(self):
+        df_udp = self.df['udp.time_delta']
+        df_tcp = self.df['tcp.time_delta']
+        if not df_udp.isnull().all() and not df_tcp.isnull().all():
+            df = pd.concat([df_udp, df_tcp])
+        elif not df_udp.isnull().all():
+            df = df_udp
+        else:
+            df = df_tcp
+        if not df.isnull().all():
+            return df.std()
+        return 0
 

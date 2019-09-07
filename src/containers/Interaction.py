@@ -2,6 +2,7 @@ import pandas as pd
 from containers.Session import *
 from containers.PacketContainer import PacketContainer
 import time
+from configs import conf
 
 """
 Class Interaction
@@ -98,5 +99,20 @@ class Interaction(PacketContainer):
             curr_fiveple = ['UDP', row['ip.dst'], row['udp.dstport'], row['ip.src'], row['udp.srcport']]
 
         return ''.join(str(x) + ' ' for x in curr_fiveple)
-    
-    
+
+    @staticmethod
+    def get_delay_label(delay_val):
+        delay_val = float(delay_val)
+        delay_range = conf.delay_range
+        if 1 <= delay_val < 2:
+            return delay_range['1-2']
+        elif 2 <= delay_val < 3:
+            return delay_range['2-3']
+        elif 3 <= delay_val < 4:
+            return delay_range['3-4']
+        elif 4 <= delay_val < 5:
+            return delay_range['4-5']
+        elif 5 <= delay_val < 8:
+            return delay_range['5-8']
+        else:
+            print("no label match")

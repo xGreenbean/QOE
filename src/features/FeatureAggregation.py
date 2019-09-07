@@ -41,6 +41,12 @@ class FeatureAggregation:
         for index, df in enumerate(self.df_list):
             self.sizes[index] = df['frame.len'].sum()
 
+        self.element_time = np.zeros(len(self.df_list))
+        for index, df in enumerate(self.df_list):
+            max_t = df['frame.time_epoch'].max()
+            min_t = df['frame.time_epoch'].min()
+            self.element_time[index] = max_t - min_t
+
         self.silences = np.zeros(len(self.df_list))
         for i in range(len(self.df_list) - 1):
             max_t = self.df_list[i]['frame.time_epoch'].max()
@@ -75,6 +81,12 @@ class FeatureAggregation:
     def std_element_size(self):
         return self.sizes.std()
 
+    def var_element_size(self):
+        return self.sizes.var()
+
+    def sum_element_size(self):
+        return self.sizes.sum()
+
     def max_silence_time(self):
         return self.silences.max()
 
@@ -88,6 +100,12 @@ class FeatureAggregation:
     def std_silence_time(self):
         return self.silences.std()
 
+    def var_silence_time(self):
+        return self.silences.var()
+
+    def sum_silence_time(self):
+        return self.silences.sum()
+
     def max_element_length(self):
         return self.lens.max()
 
@@ -100,5 +118,36 @@ class FeatureAggregation:
     def std_element_length(self):
         return self.lens.std()
 
+    def var_element_length(self):
+        return self.lens.var()
+
+    def sum_element_length(self):
+        return self.lens.sum()
+
     def element_count(self):
         return len(self.df_list)
+
+    def max_element_time(self):
+        return self.element_time.max()
+
+    def min_element_time(self):
+        return self.element_time.min()
+
+    def mean_element_time(self):
+        return self.element_time.mean()
+
+    def std_element_time(self):
+        return self.element_time.std()
+
+    def var_element_time(self):
+        return self.element_time.var()
+
+    def sum_element_time(self):
+        return self.element_time.sum()
+
+
+
+
+
+
+

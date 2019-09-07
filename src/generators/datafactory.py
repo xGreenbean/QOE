@@ -16,6 +16,7 @@ global down_link
 global num_req_res
 global first_packet_time
 global last_packet_time
+
 up_link = 0
 down_link = 1
 num_req_res = 2
@@ -66,14 +67,18 @@ class DataFactory:
         for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
             for fname in fileList:
                 if fname.endswith('.csv'):
-
+                    if 'iphone' in fname:
+                        label = 1
+                    else:
+                        label = 2
                     df = pd.read_csv(os.path.join(dirName,fname))
                     temp_interaction = Interaction(df)
 
                     for sess in temp_interaction.get_sessions():
+
                         dict = {}
                         dict.update([('filter', sess.to_filter()),('source_file', fname),
-                                     ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
+                                     ('label', label), ('sni', sess.get_sni())])
 
                         dict.update(zip(conf.header_down, FeaturesCalculation(sess.get_flows()[1])
                                           .apply(conf.app_flowdown)))
@@ -88,10 +93,11 @@ class DataFactory:
                                         FeatureAggregation(Peaker(sess.get_df())
                                                            .get_dfs())
                                              .apply(conf.app_agg)))
+
                         if breaker:
                             dict.update(zip(conf.header_break,
-                                        FeatureAggregation(Breaker(sess)
-                                                           .get_dfs())
+                                        FeatureAggregation(Breaker()
+                                                           .get_dfs(sess.get_df()))
                                             .apply(conf.app_agg)))
 
                         dict_list.append(dict)
@@ -100,7 +106,7 @@ class DataFactory:
         df.to_csv(path)
 
     @staticmethod
-    def bins_to_csv(label_dict=conf.video, peaker=False, breaker=False, bin_size=5,path='test.csv'):
+    def bins_to_csv(label_dict=conf.video, peaker=False, breaker=False, bin_size=5, path='test.csv'):
         dict_list = []
         for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
             print(dirName, fileList)
@@ -109,7 +115,6 @@ class DataFactory:
                     print(fname)
                     df = pd.read_csv(os.path.join(dirName, fname))
                     temp_interaction = Interaction(df)
-
                     for sess in temp_interaction.get_sessions():
 
                         if peaker:
@@ -118,16 +123,17 @@ class DataFactory:
                                     dict = {}
                                     dict.update([('filter', sess.to_filter()), ('source_file', fname),
                                                  ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
-                                    dict.update(zip(conf.header_break,
+                                    dict.update(zip(conf.header_peak,
                                                     FeatureAggregation(bin)
                                                     .apply(conf.app_agg)))
+
                                     dict.update(zip(conf.header_first,
                                                     FeaturesCalculation(bin[0])
                                                     .apply(conf.app_sess)))
                                     dict_list.append(dict)
 
                         if breaker:
-                            for bin in Breaker(sess).get_bins(bin_size):
+                            for bin in Breaker().get_bins(bin_size=bin_size, df=sess.get_df()):
                                 if len(bin) != 0:
                                     dict = {}
                                     dict.update([('filter', sess.to_filter()), ('source_file', fname),
@@ -143,8 +149,10 @@ class DataFactory:
         df = pd.DataFrame(dict_list)
         df.to_csv(path)
 
-    @staticmethod #get df
-    def qualities_big_packet_to_csv(breaker=False, peaker=False, csv_path='test_big_packet_breaker.csv'):
+###################################################
+
+    @staticmethod
+    def qualities_big_packet_to_csv(csv_path='test_big_packet_quality.csv'):
         full_df = None
         dict_list = []
         sql_file_path = None
@@ -164,7 +172,9 @@ class DataFactory:
                     divided_file_list = DataParser(df=full_df, sql_file=sql_file_path).divide_playbacks()
                     for one_playback in divided_file_list:
                         df = one_playback[data_frame]
-                        bp_list = BigPacket(df=df, interval_size=1, lookup_sni=sni).bp_break()
+                        bp_int = BigPacket(df=df, interval_size=1, lookup_sni=sni)
+                        bp_list = bp_int.bp_break()
+                        client = bp_int.get_client()
                         qoe = one_playback[qualities]
 
                         first_time = min(qoe)
@@ -181,7 +191,8 @@ class DataFactory:
                                     break
                             curr_df = df[(df['frame.time_epoch'] > bp[first_packet_time]) & (df['frame.time_epoch']
                                                                                              <= bp[last_packet_time])]
-
+                            up_bp = curr_df[curr_df['ip.src'] == client]
+                            down_bp = curr_df[curr_df['ip.dst'] == client]
                             dict_row = {}
                             dict_row.update([('filter', str(bp[first_packet_time]) + "_" +
                                               str(bp[last_packet_time])), ('source_file', fname),
@@ -189,15 +200,13 @@ class DataFactory:
                             dict_row.update([('bp_num_request_response', bp[num_req_res]),
                                              ('bp_up_link', bp[up_link]), ('bp_down_link', bp[down_link])])
 
-                            dict_row.update(zip(conf.header_quality_bp,
-                                                FeaturesCalculation(curr_df).apply(conf.quality_bp)))
+                            dict_row.update(zip(conf.header_net_tran_up,
+                                                FeaturesCalculation(up_bp).apply(conf.net_tran_features)))
+                            dict_row.update(zip(conf.header_net_tran_down,
+                                                FeaturesCalculation(down_bp).apply(conf.net_tran_features)))
+                            dict_row.update(zip(conf.header_net_tran,
+                                                FeaturesCalculation(curr_df).apply(conf.net_tran_features)))
                             dict_list.append(dict_row)
-                            if peaker:
-                                dict_row.update(zip(conf.header_peak, FeatureAggregation(Peaker(curr_df).get_dfs())
-                                                    .apply(conf.app_agg)))
-                            if breaker:
-                                dict_row.update(zip(conf.header_break, FeatureAggregation(Breaker().get_dfs(curr_df))
-                                                    .apply(conf.app_agg)))
 
                     full_df = None
                     sql_file_path = None
@@ -226,23 +235,23 @@ class DataFactory:
                     for one_playback in divided_file_list:
                         df = one_playback[data_frame]
                         qoe = one_playback[qualities]
-                        sess_list = Interaction(df).get_sessions()
-                        #sess_sni_list = []
+                        interaction = Interaction(df)
+                        sess_list = interaction.get_sessions()
+                        client = interaction.get_client_ip()
                         peak_list = []
                         for sess in sess_list:
                             if sni in sess.get_sni():
                                 peak_list.extend([x for x in Peaker(sess.get_df()).get_dfs() if x['frame.len']
-                                                 .sum() > 1000])
-                        #df = pd.concat(sess_sni_list)
+                                                 .sum() > 3000])
                         peak_list.sort(key=lambda x: x.iloc[0]['frame.time_epoch'])
-                        #df.sort_values('frame.time_epoch')
-                        #peak_list = Peaker(df).get_dfs()
 
                         curr_time = min(qoe)
                         curr_quality = qoe[curr_time]
                         del qoe[curr_time]
                         is_first = False
                         for peak in peak_list:
+                            peak_up = peak[peak['ip.src'] == client]
+                            peak_down = peak[peak['ip.dst'] == client]
                             peak_start_time = peak['frame.time_epoch'].min()
                             peak_end_time = peak['frame.time_epoch'].max()
                             for time_key, quality in qoe.items():
@@ -257,8 +266,13 @@ class DataFactory:
                             dict_row.update([('filter', "_"), ('source_file', fname),
                                              ('label', curr_quality), ('peak_size', peak['frame.len'].sum())])
 
-                            dict_row.update(zip(conf.header_quality_peaks, FeaturesCalculation(peak)
-                                                .apply(conf.quality_peaks)))
+                            dict_row.update(zip(conf.header_net_tran_up,
+                                                FeaturesCalculation(peak_up).apply(conf.net_tran_features)))
+                            dict_row.update(zip(conf.header_net_tran_down,
+                                                FeaturesCalculation(peak_down).apply(conf.net_tran_features)))
+                            dict_row.update(zip(conf.header_net_tran,
+                                                FeaturesCalculation(peak).apply(conf.net_tran_features)))
+
                             dict_list.append(dict_row)
 
                     full_df = None
@@ -268,6 +282,77 @@ class DataFactory:
 
     @staticmethod
     def qualities_breaker_to_csv(csv_path='test_breaker.csv'):
+        full_df = None
+        dict_list = []
+        sql_file_path = None
+
+        for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
+            if 'YouTube' in dirName:
+                sni = 'googlevideo'
+            else:
+                sni = 'nflxvideo'
+
+            for fname in fileList:
+                if fname.endswith('.csv'):
+                    full_df = pd.read_csv(os.path.join(dirName, fname))
+                elif fname.endswith('.mf'):
+                    sql_file_path = os.path.join(dirName, fname)
+
+                if full_df is not None and sql_file_path is not None:
+                    divided_file_list = DataParser(df=full_df, sql_file=sql_file_path).divide_playbacks()
+                    for one_playback in divided_file_list:
+                        df = one_playback[data_frame]
+                        qoe = one_playback[qualities]
+                        interaction = Interaction(df)
+                        sess_list = interaction.get_sessions()
+                        client = interaction.get_client_ip()
+                        sess_sni_list = []
+                        for sess in sess_list:
+                            if sni in sess.get_sni() and sess.get_volume() > 1000000:
+                                sess_sni_list.append(sess.get_df())
+
+                        df = pd.concat(sess_sni_list)
+                        df.sort_values('frame.time_epoch')
+                        req_res_list = [x for x in Breaker().get_dfs(df) if x['frame.len'].sum() > 3000]
+                        curr_time = min(qoe)
+                        curr_quality = qoe[curr_time]
+                        del qoe[curr_time]
+                        is_first = False
+                        for req_res in req_res_list:
+                            req = req_res[req_res['ip.src'] == client]
+                            res = req_res[req_res['ip.src'] != client]
+                            req_res_start_time = req_res['frame.time_epoch'].min()
+                            req_res_end_time = req_res['frame.time_epoch'].max()
+                            for time_key, quality in qoe.items():
+                                if not (curr_time <= req_res_start_time and req_res_end_time <= time_key) and is_first:
+                                    curr_time = time_key
+                                    curr_quality = quality
+                                    del qoe[curr_time]
+                                    break
+
+                            is_first = True
+                            dict_row = {}
+                            dict_row.update([('filter', "_"), ('source_file', fname),
+                                             ('label', curr_quality), ('req_response_size', req_res['frame.len'].sum())])
+
+                            dict_row.update(zip(conf.header_net_tran_up,
+                                                FeaturesCalculation(req).apply(conf.net_tran_features)))
+                            dict_row.update(zip(conf.header_net_tran_down,
+                                                FeaturesCalculation(res).apply(conf.net_tran_features)))
+                            dict_row.update(zip(conf.header_net_tran,
+                                                FeaturesCalculation(req_res).apply(conf.net_tran_features)))
+
+                            dict_list.append(dict_row)
+
+                    full_df = None
+                    sql_file_path = None
+        df = pd.DataFrame(dict_list)
+        df.to_csv(csv_path)
+
+#########################################
+
+    @staticmethod
+    def qualities_bins_big_packet_to_csv(csv_path='test_big_packet_bins.csv', bin_size=1):
         full_df = None
         dict_list = []
         sql_file_path = None
@@ -288,38 +373,42 @@ class DataFactory:
                     for one_playback in divided_file_list:
                         df = one_playback[data_frame]
                         qoe = one_playback[qualities]
-                        sess_list = Interaction(df).get_sessions()
-                        sess_sni_list = []
-                        for sess in sess_list:
-                            if sni in sess.get_sni():
-                                sess_sni_list.append(sess.get_df())
+                        bp_bin_list = BigPacket(df=df, interval_size=1, lookup_sni=sni).get_bins(bin_size=bin_size)
 
-                        df = pd.concat(sess_sni_list)
-                        df.sort_values('frame.time_epoch')
-                        req_res_list = [x for x in Breaker().get_dfs(df) if x['frame.len'].sum() > 3000]
+                        first_time = min(qoe)
+                        curr_quality = qoe[first_time]
+                        del qoe[first_time]
+                        not_first = False
 
-                        curr_time = min(qoe)
-                        curr_quality = qoe[curr_time]
-                        del qoe[curr_time]
-                        is_first = False
-                        for req_res in req_res_list:
-                            req_res_start_time = req_res['frame.time_epoch'].min()
-                            req_res_end_time = req_res['frame.time_epoch'].max()
-                            for time_key, quality in qoe.items():
-                                if not (curr_time <= req_res_start_time and req_res_end_time <= time_key) and is_first:
-                                    curr_time = time_key
-                                    curr_quality = quality
-                                    del qoe[curr_time]
-                                    break
-
-                            is_first = True
-                            dict_row = {}
-                            dict_row.update([('filter', "_"), ('source_file', fname),
-                                             ('label', curr_quality), ('req_response_size', req_res['frame.len'].sum())])
-
-                            dict_row.update(zip(conf.header_quality_breaker, FeaturesCalculation(req_res)
-                                                .apply(conf.quality_breaker)))
-                            dict_list.append(dict_row)
+                        for bin in bp_bin_list:
+                                df_bin = []
+                                for bp in bin:
+                                    bp_start_time = bp[first_packet_time]
+                                    bp_end_time = bp[last_packet_time]
+                                    curr_df = df[
+                                        (df['frame.time_epoch'] > bp_start_time) & (df['frame.time_epoch']
+                                                                                            <= bp_end_time)]
+                                    df_bin.append(curr_df)
+                                max_bin_time = pd.concat(df_bin)['frame.time_epoch'].max()
+                                min_bin_time = pd.concat(df_bin)['frame.time_epoch'].min()
+                                for time_key, quality in qoe.items():
+                                    if not(first_time <= min_bin_time and max_bin_time <= time_key) and not_first:
+                                        first_time = time_key
+                                        curr_quality = quality
+                                        del qoe[first_time]
+                                        break
+                                not_first = True
+                                if len(df_bin) != 0:
+                                    dict = {}
+                                    dict.update([('filter', ""), ('source_file', fname),
+                                                 ('label', curr_quality)])
+                                    dict.update(zip(conf.header_big_pakcet,
+                                                    FeatureAggregation(df_bin)
+                                                    .apply(conf.app_agg)))
+                                    dict.update(zip(conf.header_first,
+                                                    FeaturesCalculation(df_bin[0])
+                                                    .apply(conf.app_sess)))
+                                    dict_list.append(dict)
 
                     full_df = None
                     sql_file_path = None
@@ -349,39 +438,43 @@ class DataFactory:
                         df = one_playback[data_frame]
                         qoe = one_playback[qualities]
                         sess_list = Interaction(df).get_sessions()
-                        bin_list = []
-
+                        sess_sni_list = []
                         for sess in sess_list:
                             if sni in sess.get_sni():
-                                peak_list = [x for x in Peaker(sess.get_df()).get_dfs() if x['frame.len'].sum() > 3000]
-                                bin_list.extend(Peaker.get_bins(df_list=peak_list, bin_size=bin_size))
-                        bin_list.sort(key=lambda x: (x[0]).iloc[0]['frame.time_epoch'])
+                                sess_sni_list.append(sess.get_df())
+
+                        df = pd.concat(sess_sni_list)
+                        df = df.sort_values('frame.time_epoch')
+
+                        peak_list = [x for x in Peaker(df).get_dfs() if x['frame.len'].sum() > 3000]
+                        bins_peak_list = Peaker.get_bins_h(bin_size=bin_size, df_list=peak_list)
 
                         first_time = min(qoe)
                         curr_quality = qoe[first_time]
                         del qoe[first_time]
                         not_first = False
-                        for bin in bin_list:
-                                max_bin_time = pd.concat(bin)['frame.time_epoch'].max()
-                                min_bin_time = pd.concat(bin)['frame.time_epoch'].min()
-                                for time_key, quality in qoe.items():
-                                    if not(first_time <= min_bin_time and max_bin_time <= time_key) and not_first:
-                                        first_time = time_key
-                                        curr_quality = quality
-                                        del qoe[first_time]
-                                        break
-                                not_first = True
-                                if len(bin) != 0:
-                                    dict = {}
-                                    dict.update([('filter', ""), ('source_file', fname),
-                                                 ('label', curr_quality)])
-                                    dict.update(zip(conf.header_break,
-                                                    FeatureAggregation(bin)
-                                                    .apply(conf.app_agg)))
-                                    dict.update(zip(conf.header_first,
-                                                    FeaturesCalculation(bin[0])
-                                                    .apply(conf.app_sess)))
-                                    dict_list.append(dict)
+                        for bin in bins_peak_list:
+                            max_bin_time = pd.concat(bin)['frame.time_epoch'].max()
+                            min_bin_time = pd.concat(bin)['frame.time_epoch'].min()
+                            for time_key, quality in qoe.items():
+                                if not (first_time <= min_bin_time and max_bin_time <= time_key) and not_first:
+                                    first_time = time_key
+                                    curr_quality = quality
+                                    del qoe[first_time]
+                                    break
+                            not_first = True
+                            if len(bin) != 0:
+                                dict = {}
+                                dict.update([('filter', ""), ('source_file', fname),
+                                             ('label', curr_quality)])
+                                dict.update(zip(conf.header_peak,
+                                                FeatureAggregation(bin)
+                                                .apply(conf.app_agg)))
+                                dict.update(zip(conf.header_first,
+                                                FeaturesCalculation(bin[0])
+                                                .apply(conf.app_sess)))
+
+                                dict_list.append(dict)
 
                     full_df = None
                     sql_file_path = None
@@ -445,6 +538,7 @@ class DataFactory:
                                     dict.update(zip(conf.header_first,
                                                     FeaturesCalculation(bin[0])
                                                     .apply(conf.app_sess)))
+
                                     dict_list.append(dict)
 
                     full_df = None
@@ -452,8 +546,11 @@ class DataFactory:
         df = pd.DataFrame(dict_list)
         df.to_csv(csv_path)
 
+#########################################
+
     @staticmethod
-    def start_delay_bins_to_csv(peaker=False, breaker=False, bin_size=3, csv_path='test_delay_10.csv', x_seconds=10):
+    def start_delay_to_csv(peaker=False, breaker=False, full_interval=False, csv_path='test_delay_10.csv',
+                                x_seconds=10):
         full_df = None
         dict_list = []
         sql_file_path = None
@@ -462,6 +559,7 @@ class DataFactory:
                 sni = 'googlevideo'
             else:
                 sni = 'nflxvideo'
+                sni = 'googlevideo'
 
             for fname in fileList:
                 if fname.endswith('.csv'):
@@ -470,63 +568,48 @@ class DataFactory:
                     sql_file_path = os.path.join(dirName, fname)
 
                 if full_df is not None and sql_file_path is not None:
+                    print("hi")
                     divided_file_list = DataParser(df=full_df, sql_file=sql_file_path).divide_playbacks()
-                    for one_playback in divided_file_list:
-                        df = one_playback[data_frame]
-                        sess_list = Interaction(df).get_sessions()
-                        start_delay_time = one_playback[delay_time]
+                    for df, qoe, start_time in divided_file_list:
+                        _int = Interaction(df=df)
+                        sess_list = _int.get_sessions()
+                        video_sessions = []
 
                         for sess in sess_list:
                             if sni in sess.get_sni():
-                                df = sess.get_df()
-                                first_time = df['frame.time_epoch'].min()
-                                df = df[(df['frame.time_epoch'] >= first_packet_time) & (df['frame.time_epoch'] <=
-                                                                                         (first_time+x_seconds))]
+                                video_sessions.append(sess.get_df())
 
-                                if peaker:
-                                    for bin in Peaker(df).get_bins(bin_size=bin_size):
-                                        if len(bin) != 0:
-                                            dict = {}
-                                            dict.update([('filter', sess.to_filter()), ('source_file', fname),
-                                                         ('label', start_delay_time), ('sni', sess.get_sni())])
-                                            dict.update(zip(conf.header_break,
-                                                            FeatureAggregation(bin)
-                                                            .apply(conf.app_agg)))
-                                            dict.update(zip(conf.header_first,
-                                                            FeaturesCalculation(bin[0])
-                                                            .apply(conf.app_sess)))
-                                            dict_list.append(dict)
+                        video_sessions = pd.concat(video_sessions).sort_values('frame.time_epoch')
+                        video_sessions['date'] = video_sessions['frame.time_epoch']. \
+                            apply(datetime.datetime.fromtimestamp)  # convert epoch to datetime.
+                        video_sessions['date'] -= video_sessions['date'].min()  # by first packet in sessions.
+                        video_sessions = [item[1] for item in
+                                          video_sessions.groupby(pd.Grouper(key='date', freq=str(x_seconds) + 'S'))]
+                        df_list = []
+                        if breaker:
+                            b = Breaker()
+                            df_list = b.sess_break(video_sessions[0])
 
-                                if breaker:
-                                    for bin in Breaker().get_bins(df=df, bin_size=bin_size):
-                                        if len(bin) != 0:
-                                            dict = {}
-                                            dict.update([('filter', sess.to_filter()), ('source_file', fname),
-                                                         ('label', start_delay_time), ('sni', sess.get_sni())])
-                                            dict.update(zip(conf.header_break,
-                                                            FeatureAggregation(bin)
-                                                            .apply(conf.app_agg)))
-                                            dict.update(zip(conf.header_first,
-                                                            FeaturesCalculation(bin[0])
-                                                            .apply(conf.app_sess)))
-                                            dict_list.append(dict)
-                full_df = None
-                sql_file_path = None
+                        if peaker:
+                            p = Peaker(video_sessions[0])
+                            df_list = p.get_dfs()
+
+                        if full_interval:
+                            df_list = [video_sessions[0]]
+
+                        for _df in df_list:
+                            dict_row = {}
+                            dict_row.update([('filter', "_"), ('source_file', fname),
+                                             ('label', Interaction.get_delay_label(start_time)),
+                                             ('peak_size', _df['frame.len'].sum())])
+
+                            dict_row.update(zip(conf.header_net_tran,
+                                                FeaturesCalculation(_df).apply(conf.net_tran_features)))
+                            dict_list.append(dict_row)
+                    full_df = None
+                    sql_file_path = None
 
         df = pd.DataFrame(dict_list)
         df.to_csv(csv_path)
 
 
-DataFactory.qualities_breaker_to_csv(csv_path='test2_breaker_filter3000_0.03_300.csv')
-print("done1")
-DataFactory.qualities_bins_peaks_to_csv(csv_path='test2_peaks_bins3_filter3000.csv', bin_size=3)
-print("done2")
-
-#DataFactory.qualities_big_packet_to_csv(breaker=True, csv_path='test_big_packet_breaker_0.03_250.csv')
-#print("done3")
-
-DataFactory.qualities_bins_breaker_to_csv(csv_path='test2_breaker_bins3_filter3000_0.03_300.csv', bin_size=3)
-print("done4")
-
-####
-#DataFactory.start_delay_bins_to_csv(peaker=True, breaker=True)

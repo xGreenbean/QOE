@@ -1,5 +1,6 @@
 import sqlite3
 import pandas as pd
+import os
 from configs import conf
 from tools.BigPacket import BigPacket
 from sqlite3 import Error
@@ -100,12 +101,22 @@ class DataParser:
 
 
 if __name__ == '__main__':
+    full_df = None
+    dict_list = []
+    sql_file_path = None
+    for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
+        if 'YouTube' in dirName:
+            sni = 'googlevideo'
+        else:
+            sni = 'nflxvideo'
 
-    sql_file_path = 'C:\\Users\\Saimon\\Desktop\\faf\\YouTube\\youtube_cycles\\x.mf'
-    full_df = pd.read_csv('C:\\Users\\Saimon\\Desktop\\faf\\YouTube\\youtube_cycles\\YT_4k_OPT.csv')
-    playbacks = DataParser(df=full_df, sql_file=sql_file_path).divide_playbacks()
-    #bp = BigPacket(interval_size=1, df=playbacks[0][0], lookup_sni='googlevideo')
-    #brk_list = bp.bp_break()
-    qoe = playbacks[0][1]
-    print(qoe)
+        for fname in fileList:
+            if fname.endswith('.csv'):
+                full_df = pd.read_csv(os.path.join(dirName, fname))
+            elif fname.endswith('.mf'):
+                sql_file_path = os.path.join(dirName, fname)
 
+            if full_df is not None and sql_file_path is not None:
+                divided_file_list = DataParser(df=full_df, sql_file=sql_file_path).divide_playbacks()
+                for play in divided_file_list:
+                    print(play[1])

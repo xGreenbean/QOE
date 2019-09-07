@@ -22,6 +22,7 @@ class BigPacket:
         self.interval_size = interval_size
         self.df = df
         self.sni = lookup_sni
+        self.client = None
 
     def bp_break(self):
         df_list = self.calculate_sessions_intervals()
@@ -60,6 +61,8 @@ class BigPacket:
 
         for item in divided_intervals:
             temp_interaction = Interaction(item[1])
+            if self.client is None:
+                self.client = temp_interaction.get_client_ip()
             dict_sess = {}
             for sess in temp_interaction.get_sessions():
                 sess_sni = sess.get_sni()
@@ -113,3 +116,6 @@ class BigPacket:
             bins_list.append(df)
             df = []
         return bins_list
+
+    def get_client(self):
+        return self.client

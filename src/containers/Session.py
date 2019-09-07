@@ -72,6 +72,12 @@ class Session(PacketContainer):
         downloads = pd[pd['ip.src'] == self.dstIp]
         return uploads, downloads
 
+    def get_flow_up(self):
+        return self.flow_up
+
+    def get_flow_down(self):
+        return self.flow_down
+
     def get_session_size(self):
         fc = FeaturesCalculation(self.df)
         return fc.packets_size()
@@ -111,7 +117,7 @@ class Session(PacketContainer):
             for value in values:
                 if value in self.get_sni():
                     return key
-            return 'unknown'
+        return 'unknown'
 
     def get_avg_pkt(self):
         return self.df['frame.len'].mean()
