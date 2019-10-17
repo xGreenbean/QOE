@@ -20,8 +20,8 @@ def run_rfr_quality(test_size, num_trees, rs_test_train, rs_regressor, classifie
     #   only for video/no video, for app remove
     # One-hot encode the data using pandas get_dummies
 
-    features = pd.read_csv('C:\\QOE\\Src\\test_quality_peaks_up_down_all.csv')
-    features = features[pd.notnull(features['up_duration'])]
+    features = pd.read_csv('C:\\QOE\\Src\\test_quality_big_packet_bins_3.csv')
+    #features = features[pd.notnull(features['up_duration'])]
 
     network = ["up_packet_count", "up_min_packet_size", "up_max_packet_size",
                           "up_mean_packet_size", "up_std_packet_size", "up_size_var", "up_max_time_delta",
@@ -64,7 +64,7 @@ def run_rfr_quality(test_size, num_trees, rs_test_train, rs_regressor, classifie
     ia = ["d_max_packet_size","d_upstream_mean_ttl",
     "d_tran_len_max"]
 
-    features = features.drop(ia, axis=1)
+    #features = features.drop(ia, axis=1)
 
     features = features.drop(['filter', 'source_file', 'Unnamed: 0'], axis=1)
 
@@ -111,31 +111,32 @@ def run_rfr_quality(test_size, num_trees, rs_test_train, rs_regressor, classifie
     return predictions
 
 
-def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor, classifier_features=[], classifier_labels=[]):
+def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor, classifier_features=[], classifier_labels=[],
+                  train_features=None):
 
     #   only for video/no video, for app remove
     # One-hot encode the data using pandas get_dummies
-    print("video bin3 peak without first")
-    features = pd.read_csv('C:\\QOE\\Src\\sess_os_all.csv')
+    if train_features is not None:
+        features = train_features
+    else:
+        features = pd.read_csv('C:\\QOE\\Src\\sess_video_no_video_all_treshold.csv')
+
     print("video ", (features['label'] == 'video').sum(),"unknown ",
           (features['label'] != 'video').sum())
 
-    features = features.drop(['sni','filter','source_file', 'Unnamed: 0'], axis=1)
-    features = features[pd.notnull(features['f_size_var'])]
-
-    #features = features.drop(header_first, axis=1)
-    #features = features.drop(conf.header_peak, axis=1)
-
+    features = features.drop(['sni', 'filter', 'source_file', 'Unnamed: 0'], axis=1)
     features = features.sample(frac=1)
     features = pd.get_dummies(features)
     # Labels are the values we want to predict
 
-    labels = np.array(features[['label_unknown','label_video']])
+    labels = np.array(features[['label_unknown', 'label_video']])
     # Remove the labels from the features
     # axis 1 refers to the columns
     # Convert to numpy array
-    features = features.drop(['label_unknown','label_video'], axis=1)
+    features = features.drop(['label_unknown', 'label_video'], axis=1)
+    #features = features.drop(['upstream_ssl_v_0'], axis=1)
     cols = features.columns
+
     features = np.array(features)
 
     # Split the data into training and testing sets
@@ -152,7 +153,6 @@ def run_rfr_video(test_size, num_trees, rs_test_train, rs_regressor, classifier_
     predictions = rf.predict(test_features)
     # Calculate the absolute errors
     errors = abs(predictions - test_labels)
-
 
     print("Train Accuracy:", metrics.accuracy_score(train_labels, rf.predict(train_features)))
     print("Test Accuracy:", metrics.accuracy_score(predictions, test_labels))
@@ -221,7 +221,7 @@ def run_rfr_app(test_size, num_trees, rs_test_train, rs_regressor):
 
 def run_rfr_rg_delay(test_size, num_trees, rs_test_train, rs_regressor):
     # Read in data and display first 5 rows
-    features = pd.read_csv('C:\\QOE\\Src\\test_delay_Peak.csv')
+    features = pd.read_csv('C:\\QOE\\Src\\test_delay_big_breaker_quality.csv')
     # features = features[pd.notnull(features['up_duration'])]
 
     header_net_tran = ["packet_count", "min_packet_size", "max_packet_size",
@@ -279,7 +279,7 @@ def run_rfr_delay(test_size, num_trees, rs_test_train, rs_regressor, classifier_
     #   only for video/no video, for app remove
     # One-hot encode the data using pandas get_dummies
 
-    features = pd.read_csv('C:\\QOE\\Src\\test_delay_Breaker_classifier.csv')
+    features = pd.read_csv('C:\\QOE\\Src\\test_delay_breaker_quality.csv')
     #features = features[pd.notnull(features['up_duration'])]
 
 
@@ -333,13 +333,53 @@ def run_rfr_delay(test_size, num_trees, rs_test_train, rs_regressor, classifier_
     return predictions
 
 
+def run_rfr_video_class(test_size, num_trees, rs_test_train, rs_regressor, classifier_features=[],
+                        classifier_labels=[], train_features=None):
+
+    #   only for video/no video, for app remove
+    # One-hot encode the data using pandas get_dummies
+    features = train_features
+    labels = np.array(features[['label_unknown', 'label_video']])
+    # Remove the labels from the features
+    # axis 1 refers to the columns
+    # Convert to numpy array
+    features = features.drop(['label_unknown', 'label_video'], axis=1)
+    cols = features.columns
+
+    features = np.array(features)
+
+    # Split the data into training and testing sets
+    train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=test_size,
+                                                                                random_state=rs_test_train)
+    rf = RandomForestClassifier(n_estimators=num_trees, random_state=rs_regressor)
+
+    # Train the model on training data
+    rf.fit(train_features, train_labels)
+    test_features = classifier_features
+    test_labels = classifier_labels
+
+    predictions = rf.predict(test_features)
+    # Calculate the absolute errors
+    errors = abs(predictions - test_labels)
+
+    print("Train Accuracy:", metrics.accuracy_score(train_labels, rf.predict(train_features)))
+    print("Test Accuracy:", metrics.accuracy_score(predictions, test_labels))
+    print(" Confusion matrix\n", confusion_matrix(test_labels.argmax(axis=1), predictions.argmax(axis=1)))
+
+    feature_importances = pd.DataFrame(rf.feature_importances_,
+                                       index=cols,
+                                       columns=['importance']).sort_values('importance', ascending=False)
+    print(feature_importances)
+    return predictions
+
+
 
 
 if __name__ == '__main__':
     # 1156 41 42
     #579
     #quality 1289 ,41,42 (0.3, 2139, 41, 42) (1539, 41, 42)
-    run_rfr_quality(0.3, 1156, 41, 42)
+    run_rfr_rg_delay(0.3, 1156, 41, 42)
 
     # all: 56 network:58 tran:55
     # breaker all: 62 network:61 tran:64

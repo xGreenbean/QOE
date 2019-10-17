@@ -11,10 +11,10 @@ import pandas as pd
 
 if __name__ == '__main__':
 
-    DataFactory.sessions_to_csv(label_dict=None, peaker=True, breaker=True, path='sess_os_all.csv')
+    #DataFactory.sessions_to_csv(label_dict=None, peaker=True, breaker=True, path='sess_os_all.csv')
 
-    #DataFactory.sessions_to_csv(label_dict=conf.video, peaker=True, breaker=True, video=True,
-    #                            path='sess_video_no_video_all.csv')
+    DataFactory.sessions_to_csv(label_dict=conf.video, peaker=False, breaker=True,
+                                path='sess_video_no_video_all_treshold.csv')
     #DataFactory.sessions_to_csv(label_dict=conf.application_sni, peaker=True, breaker=True, video=False,
     #                            path='sess_application_all.csv')
 
@@ -47,3 +47,5 @@ if __name__ == '__main__':
                                    #csv_path='test_delay_Peak_classifier.csv', x_seconds=10)
     #DataFactory.start_delay_to_csv(peaker=False, breaker=True, full_interval=False,
                                    #csv_path='test_delay_Breaker_classifier.csv', x_seconds=10)
+    DataFactory.start_delay_to_csv(peaker=False, breaker=True, big_packet=False, full_interval=False,
+                                   csv_path='test_delay_big_breaker_quality.csv', x_seconds=10)

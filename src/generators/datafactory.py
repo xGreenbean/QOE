@@ -67,18 +67,14 @@ class DataFactory:
         for dirName, subdirList, fileList in os.walk(os.path.join(conf.dataset_path)):
             for fname in fileList:
                 if fname.endswith('.csv'):
-                    if 'iphone' in fname:
-                        label = 1
-                    else:
-                        label = 2
-                    df = pd.read_csv(os.path.join(dirName,fname))
+                    df = pd.read_csv(os.path.join(dirName, fname))
                     temp_interaction = Interaction(df)
 
                     for sess in temp_interaction.get_sessions():
 
                         dict = {}
                         dict.update([('filter', sess.to_filter()),('source_file', fname),
-                                     ('label', label), ('sni', sess.get_sni())])
+                                     ('label', sess.get_label(label_dict)), ('sni', sess.get_sni())])
 
                         dict.update(zip(conf.header_down, FeaturesCalculation(sess.get_flows()[1])
                                           .apply(conf.app_flowdown)))
@@ -103,6 +99,8 @@ class DataFactory:
                         dict_list.append(dict)
 
         df = pd.DataFrame(dict_list)
+        if path is None:
+            return df
         df.to_csv(path)
 
     @staticmethod
@@ -549,8 +547,8 @@ class DataFactory:
 #########################################
 
     @staticmethod
-    def start_delay_to_csv(peaker=False, breaker=False, full_interval=False, csv_path='test_delay_10.csv',
-                                x_seconds=10):
+    def start_delay_to_csv(peaker=False, breaker=False, big_packet=False, full_interval=False,
+                           csv_path='test_delay_10.csv',  x_seconds=10):
         full_df = None
         dict_list = []
         sql_file_path = None
@@ -574,6 +572,8 @@ class DataFactory:
                         _int = Interaction(df=df)
                         sess_list = _int.get_sessions()
                         video_sessions = []
+                        first_time = min(qoe)
+                        curr_quality = qoe[first_time]
 
                         for sess in sess_list:
                             if sni in sess.get_sni():
@@ -597,11 +597,17 @@ class DataFactory:
                         if full_interval:
                             df_list = [video_sessions[0]]
 
+                        ###
+                        if big_packet:
+                            df_list = BigPacket(interval_size=1, df=video_sessions[0],
+                                                lookup_sni='googlevideo').bp_break()
                         for _df in df_list:
                             dict_row = {}
+
                             dict_row.update([('filter', "_"), ('source_file', fname),
-                                             ('label', Interaction.get_delay_label(start_time)),
-                                             ('peak_size', _df['frame.len'].sum())])
+                                             ('label', float(start_time)),
+                                             ('first_quality', curr_quality),
+                                             ('element_size', _df['frame.len'].sum())])
 
                             dict_row.update(zip(conf.header_net_tran,
                                                 FeaturesCalculation(_df).apply(conf.net_tran_features)))

@@ -115,7 +115,7 @@ class Session(PacketContainer):
     def get_label(self,label_dict):
         for key, values in label_dict.items():
             for value in values:
-                if value in self.get_sni():
+                if value in self.get_sni() and self.get_volume() > 1000000:
                     return key
         return 'unknown'
 

@@ -34,7 +34,7 @@ delay_range = {"1-2": '1', "2-3": '2', "3-4": '3', "4-5": '4', "5-8": '5'}
 
 """path to dataset"""
 
-dataset_path = 'C:\\Users\\Saimon\\Desktop\\idk\\dataset'
+dataset_path = 'C:\\Users\\Saimon\\Desktop\\faf'
 
 # ------------------------------------------------------------------------------------------------------------------
 """Breaker settings"""
@@ -46,6 +46,8 @@ threshold_t = 250
 """app_vid - Feature lists to build the vector for video / no video and 
    application by session(size histogram and extension misses),
    ##### These only for TCP session. For udp All tcp&ssl features from flow up need to be gone.  """
+
+
 
 app_agg = ["max_element_size", "min_element_size", "mean_element_size", "std_element_size", "var_element_size",
            "sum_element_size", "max_silence_time", "min_silence_time","mean_silence_time", "std_silence_time",

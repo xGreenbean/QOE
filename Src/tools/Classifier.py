@@ -1,4 +1,6 @@
 from machines import RandomForest
+from generators.datafactory import DataFactory
+from configs import conf
 import pandas as pd
 import numpy as np
 
@@ -13,26 +15,35 @@ Class Classifier
 
 class Classifier:
 
-    def __init__(self, path):
-        self.feature_file = pd.read_csv(path)
+    def __init__(self, train_data):
+        self.train_dataset = train_data
 
     """
     Function call Rrf ML algorithem to decide which session in our interaction are video.
     here we use our interaction as the test part onl and the function returns a metrics of the predictions 
     """
-    def get_Rrf_prediction(self):
-        filters = self.feature_file[['filter']]
-        features = self.feature_file.drop(['sni', 'filter', 'source_file', 'Unnamed: 0'], axis=1)
-        features = features.sample(frac=1)
-        features = pd.get_dummies(features)
+
+    def get_Rrf_prediction(self, feature_file):
+        filters = feature_file['filter']
+        features = feature_file.drop(['sni', 'filter', 'source_file', 'Unnamed: 0'], axis=1)
+        #if 'upstream_ssl_v_0' in features.columns:
+        #    features = features.drop(['upstream_ssl_v_0'], axis=1)
+
         labels = np.array(features[['label_unknown', 'label_video']])
         features = features.drop(['label_unknown', 'label_video'], axis=1)
         features = np.array(features)
-        prediction = RandomForest.run_rfr_video(0.30, 1256, 41, 42, features, labels)
+        prediction = RandomForest.run_rfr_video_class(0.30, 1256, 41, 42, features, labels, train_features=self.train_dataset)
         tcp_videos, udp_videos = Classifier.find_videos(prediction, filters)
         return Classifier.decision_method(tcp_videos, udp_videos)
 
-
+    def get_Rrf_prediction_multi(self, feature_file, filters):
+        features = feature_file
+        labels = np.array(features[['label_unknown', 'label_video']])
+        features = features.drop(['label_unknown', 'label_video'], axis=1)
+        features = np.array(features)
+        prediction = RandomForest.run_rfr_video_class(0.001, 1256, 41, 42, features, labels, train_features=self.train_dataset)
+        tcp_videos, udp_videos = Classifier.find_videos(prediction, filters)
+        return Classifier.decision_method(tcp_videos, udp_videos)
 
     """
     Function gets lists of tcp and udp sessions which were found as a video session, then based
@@ -73,15 +84,68 @@ class Classifier:
         for i in range(len(predictions)):
             if predictions[i][1] == 1:
                 type_session = filters.iloc[i]
-                if 'tcp' in type_session[0]:
-                    tcp_sessions.append(type_session[0])
-                elif 'udp' in type_session[0]:
-                    udp_session.append(type_session[0])
+                print(type_session)
+                if 'tcp' in type_session:
+                    tcp_sessions.append(type_session)
+                elif 'udp' in type_session:
+                    udp_session.append(type_session)
                 else:
                     print("ERROR")
         return tcp_sessions, udp_session
 
+    def multi_decisions(self, filter_files=[]):
+        df = self.train_dataset
+        filters = df['filter']
+        sources = df['source_file']
+        df = df.drop(['sni', 'filter', 'source_file', 'Unnamed: 0'], axis=1)
+        df = df.sample(frac=1)
+        df = pd.get_dummies(df)
+        df['source_file'] = sources
+        df['filter'] = filters
+        test_dfs = []
+        filters_dfs =[]
+        for file in filter_files:
+            file = file + '.csv'
+            hold_df = df[file == df['source_file']]
+            filters_dfs.append(hold_df['filter'])
+            test_dfs.append(hold_df)
+            df = df[file != df['source_file']]
+
+        df = df.drop(['source_file'], axis=1)
+        df = df.drop(['filter'], axis=1)
+        self.train_dataset = df
+        prediction_dfs = {}
+        for i in range(len(test_dfs)):
+            holder = test_dfs[i].drop(['source_file', 'filter'], axis=1)
+            prediction_dfs.update({filter_files[i]: self.get_Rrf_prediction_multi(holder, filters_dfs[i])})
+            print("\n\ndone\n\n")
+
+        return prediction_dfs
+
+    @staticmethod
+    def test_correction(dict_results={}):
+        pass
+
 
 if __name__ == '__main__':
-    c = Classifier('C:\\QOE\\Src\\sess_breaker_c3.csv')
-    print(c.get_Rrf_prediction())
+    dfa = pd.read_csv('C:\\QOE\\Src\\sess_video_no_video_all_treshold.csv')
+    c = Classifier(dfa)
+    filtered_files = ['iphone7_facebook_04_19_id_1', 'iphone7_instagram_04_19_id_1', 'iphone7_auto_04_19_id_2',
+                      'iphone7_auto_04_19_id_3', 'iphone7_netflix_04_19_id_2', 'onePlus6_facebook_auto_04_19_id_1',
+                      'onePlus6_netflix_auto_04_19_id_4', 'onePlus6_netflix_auto_04_19_id_5',
+                      'onePlus6_auto_04_19_id_1']
+    idk = [
+            'iphone_cnn_id_1',
+            'iphone7_download_05_19_pt4',
+            'iphone7_general_05_19_id_2',
+            'iphone_twitter_id_1',
+            'xiamoi_cnn_id_2',
+            'xiamoi_twitter_id_5',
+            'onePlus6_auto_04_19_id_5']
+
+
+    al = ['iphone7_general_05_19_id_1']
+    dic = c.multi_decisions(al)
+    print(dic)
+    #feature_file = DataFactory.sessions_to_csv(label_dict=conf.video, peaker=False, breaker=True, path=None)
+    #print(c.get_Rrf_prediction(), feature_file)
